@@ -1,13 +1,14 @@
-import { forwardRef } from 'react'
+import { useRef } from 'react'
 
-export const Item = forwardRef(({ id, children, ...props }, ref) => {
+export const Item = ({ children, ...props }) => {
+	const ref = useRef(null)
 	return (
 		<div
 			{...props}
 			ref={ref}
-			className='bg-base-300 p-2 rounded-md w-[100px] h-[100px] text-base-content'
+			className='opacity-90 p-2 border border-base-content rounded-md text-base-content scale-[0.9]'
 		>
-			{children || id}
+			{children}
 		</div>
 	)
-})
+}

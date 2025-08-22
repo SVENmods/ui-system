@@ -1,21 +1,24 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { forwardRef } from 'react'
-import { useDroppable } from '@dnd-kit/core'
+// import { useDroppable } from '@dnd-kit/core'
 import classNames from 'classnames'
+import { memo } from 'react'
 
-const GridItem = forwardRef(({ id, children }) => {
+const GridItem = memo(({ id, children, editMode = false }) => {
 	const { attributes, listeners, setNodeRef, transform, transition } =
-		useSortable({ id })
+		useSortable({
+			id,
+			disabled: !editMode,
+		})
 
 	const style = {
 		transform: CSS.Transform.toString(transform),
 		transition,
 	}
 
-	const { isOver } = useDroppable({
-		id: `droppable-${id}`,
-	})
+	// const { isOver } = useDroppable({
+	// 	id: `droppable-${id}`,
+	// })
 
 	return (
 		<div
@@ -24,13 +27,15 @@ const GridItem = forwardRef(({ id, children }) => {
 			{...attributes}
 			{...listeners}
 			className={classNames(
-				'bg-base-300 p-2 rounded-md w-full h-full text-base-content flex items-center justify-center cursor-move transition-all duration-200',
+				' p-2 rounded-md w-full h-full text-base-content flex items-center justify-center transition-all duration-200',
 				{
+					'cursor-move': editMode,
+					'cursor-default': !editMode,
 					// 'bg-red-500': !isOver,
 				}
 			)}
 		>
-			{children || id}
+			{children}
 		</div>
 	)
 })

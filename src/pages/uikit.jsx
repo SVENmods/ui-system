@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import Logo from '../components/logo'
 import ComponentWrapper from '../components/system/componentWrapper'
 import SideNav from '../components/system/sidenav'
 import BtnDefault from '../components/ui/group/buttons/default/btnDefault'

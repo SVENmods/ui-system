@@ -9,7 +9,7 @@ function App() {
 	return (
 		<>
 			<div className='relative px-1 min-h-screen'>
-				<NavBar className='top-0 z-10 sticky' />
+				<NavBar className='top-0 z-11 sticky' />
 				<Routes>
 					<Route path='/' element={<Home />} />
 					<Route path='/ui' element={<UiKit />} />
