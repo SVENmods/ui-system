@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import CopyComponent from './copyComponent'
 import PreviewHtmlComponent from './previewHtmlComponent'
 import HTMLReactParser from 'html-react-parser'
@@ -37,9 +37,9 @@ const ComponentWrapper = ({
 		}
 	}, [selectedComponent, category])
 
-	let parsedHtml = (code) => {
+	const parsedHtml = useCallback((code) => {
 		return HTMLReactParser(code)
-	}
+	}, [])
 
 	const updateHtmlCode = (componentName, newHtml) => {
 		setHtmlCodes((prev) => ({
@@ -84,14 +84,17 @@ const ComponentWrapper = ({
 						}))
 					}
 				/>
-				<ComponentWrapperPreviewTab
-					components={components}
-					category={category}
-					htmlCodes={htmlCodes}
-					parsedHtml={parsedHtml}
-					highlightedComponent={highlightedComponent}
-					componentRefs={componentRefs}
-				/>
+				{selectedComponent?.category === category &&
+					selectedComponent?.tab === 'preview' && (
+						<ComponentWrapperPreviewTab
+							components={components}
+							category={category}
+							htmlCodes={htmlCodes}
+							parsedHtml={parsedHtml}
+							highlightedComponent={highlightedComponent}
+							componentRefs={componentRefs}
+						/>
+					)}
 
 				{/* HTML Tab */}
 				<input
@@ -113,12 +116,15 @@ const ComponentWrapper = ({
 						}))
 					}
 				/>
-				<ComponentWrapperHtmlTab
-					components={components}
-					htmlCodes={htmlCodes}
-					parsedHtml={parsedHtml}
-					updateHtmlCode={updateHtmlCode}
-				/>
+				{selectedComponent?.category === category &&
+					selectedComponent?.tab === 'html' && (
+						<ComponentWrapperHtmlTab
+							components={components}
+							htmlCodes={htmlCodes}
+							parsedHtml={parsedHtml}
+							updateHtmlCode={updateHtmlCode}
+						/>
+					)}
 
 				{/* JSX Tab */}
 				{/*
