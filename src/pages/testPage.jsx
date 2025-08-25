@@ -21,6 +21,7 @@ import ContextCell from '../components/system/dnd/contextCell'
 import BtnDefault from './../components/ui/group/buttons/default/btnDefault'
 import Toggle from './../components/ui/group/toggle/default/toggle'
 import classNames from 'classnames'
+import TailwindAutocomplete from '../components/system/tailwind/autocomplete'
 
 const TestPage = () => {
 	const [items, setItems] = useState([
@@ -37,6 +38,7 @@ const TestPage = () => {
 	const [activeId, setActiveId] = useState(null)
 	const [dragOverY, setDragOverY] = useState(null)
 	const [editMode, setEditMode] = useState(false)
+	const [viewMode, setViewMode] = useState(false)
 
 	// Мемоизируем вычисления для оптимизации
 	const maxY = useMemo(
@@ -74,11 +76,18 @@ const TestPage = () => {
 					id={index}
 					isLastRow={isLastRow}
 					editMode={editMode}
+					viewMode={viewMode}
 				>
-					{/*//TODO:  Добавить контекстное меню для каждого элемента */}
 					{item && (
-						<ContextCell editMode={editMode}>
-							<GridItem id={item.id} editMode={editMode}>
+						<ContextCell
+							editMode={editMode}
+							viewMode={viewMode}
+						>
+							<GridItem
+								id={item.id}
+								editMode={editMode}
+								viewMode={viewMode}
+							>
 								{item.content ? item.content : item.id}
 							</GridItem>
 						</ContextCell>
@@ -86,7 +95,7 @@ const TestPage = () => {
 				</GridCell>
 			)
 		})
-	}, [items, gridRows, editMode])
+	}, [items, gridRows, editMode, viewMode])
 	const handleDragStart = useCallback(
 		(event) => {
 			if (!editMode) return
@@ -119,61 +128,68 @@ const TestPage = () => {
 			if (!editMode) return
 			const { active, over } = event
 
-			if (active.id !== over?.id && over?.id) {
+			if (over?.id && over.id.startsWith('cell-')) {
 				const cellId = over.id
+				const cellIndex = parseInt(cellId.replace('cell-', ''))
+				const x = cellIndex % 12
+				const y = Math.floor(cellIndex / 12)
 
-				if (cellId.startsWith('cell-')) {
-					const cellIndex = parseInt(cellId.replace('cell-', ''))
-					const x = cellIndex % 12
-					const y = Math.floor(cellIndex / 12)
+				// Позволяем перемещать элементы на любую позицию в пределах расширенной сетки
+				if (x >= 0 && x < 12 && y >= 0 && y < gridRows) {
+					setItems((prevItems) => {
+						// Находим перетаскиваемый элемент
+						const draggedItem = prevItems.find(
+							(item) => item.id === active.id
+						)
 
-					// Позволяем перемещать элементы на любую позицию в пределах расширенной сетки
-					if (x >= 0 && x < 12 && y >= 0 && y < gridRows) {
-						setItems((prevItems) => {
-							// Находим элемент, который уже находится на целевой позиции
-							const targetItem = prevItems.find(
-								(item) =>
-									item.position.x === x &&
-									item.position.y === y
-							)
+						if (!draggedItem) return prevItems
 
-							// Находим перетаскиваемый элемент
-							const draggedItem = prevItems.find(
-								(item) => item.id === active.id
-							)
+						const oldPosition = draggedItem.position
+						const newPosition = { x, y }
 
-							if (targetItem && draggedItem) {
-								// Обмениваем позиции элементов
-								return prevItems.map((item) => {
-									if (item.id === active.id) {
-										return {
-											...item,
-											position: { x, y },
-										}
-									} else if (
-										item.id === targetItem.id
-									) {
-										return {
-											...item,
-											position:
-												draggedItem.position,
-										}
+						// Если позиция не изменилась, ничего не делаем
+						if (
+							oldPosition.x === newPosition.x &&
+							oldPosition.y === newPosition.y
+						) {
+							return prevItems
+						}
+
+						// Находим элемент, который уже находится на целевой позиции
+						const targetItem = prevItems.find(
+							(item) =>
+								item.position.x === x &&
+								item.position.y === y
+						)
+
+						if (targetItem) {
+							// Обмениваем позиции элементов
+							return prevItems.map((item) => {
+								if (item.id === active.id) {
+									return {
+										...item,
+										position: newPosition,
 									}
-									return item
-								})
-							} else {
-								// Просто перемещаем элемент на пустую позицию
-								return prevItems.map((item) =>
-									item.id === active.id
-										? {
-												...item,
-												position: { x, y },
-											}
-										: item
-								)
-							}
-						})
-					}
+								} else if (item.id === targetItem.id) {
+									return {
+										...item,
+										position: oldPosition,
+									}
+								}
+								return item
+							})
+						} else {
+							// Просто перемещаем элемент на пустую позицию
+							return prevItems.map((item) =>
+								item.id === active.id
+									? {
+											...item,
+											position: newPosition,
+										}
+									: item
+							)
+						}
+					})
 				}
 			}
 
@@ -189,13 +205,30 @@ const TestPage = () => {
 				<div className='flex flex-row flex-wrap lg:flex-nowrap items-start content-start gap-x-6 pt-2 w-full h-full'>
 					<SideNav className={'lg:w-[20%] w-full'} />
 					<div className='w-full lg:w-[80%]'>
-						<div className=''>
-							<Toggle
-								checked={editMode}
-								onCheckedChange={() =>
-									setEditMode(!editMode)
-								}
-							/>
+						<div className='flex items-center gap-4'>
+							<div className='flex items-center gap-2'>
+								<span className='font-medium text-sm'>
+									Edit Mode:
+								</span>
+								<Toggle
+									checked={editMode}
+									onCheckedChange={() =>
+										setEditMode(!editMode)
+									}
+								/>
+							</div>
+							<div className='flex items-center gap-2'>
+								<span className='font-medium text-sm'>
+									View Mode:
+								</span>
+								<Toggle
+									checked={viewMode && editMode}
+									onCheckedChange={() =>
+										setViewMode(!viewMode)
+									}
+									disabled={viewMode}
+								/>
+							</div>
 						</div>
 						<div
 							className={classNames('mt-5 rounded-md', {
@@ -237,6 +270,9 @@ const TestPage = () => {
 									) : null}
 								</DragOverlay>
 							</DndContext>
+						</div>
+						<div className='mt-5'>
+							<TailwindAutocomplete />
 						</div>
 					</div>
 				</div>
