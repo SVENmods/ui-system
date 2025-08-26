@@ -135,12 +135,18 @@ const TailwindAutocomplete = () => {
 			{/* Generated CSS Display */}
 			{generatedCSS && (
 				<div className='mt-4'>
-					<label className='block mb-2 font-medium text-gray-700 text-sm'>
+					<label className='block mb-2 font-medium text-sm text-base-content italic'>
 						Generated CSS
 					</label>
+					{/* <div
+						className='test-block'
+						data-dynamic-class-id='1234'
+					>
+						test
+					</div> */}
 					<div className='bg-gray-100 p-3 rounded-md'>
 						<code className='text-gray-800 text-sm'>
-							.{inputValue} {'{'} {generatedCSS} {'}'}
+							{generatedCSS}
 						</code>
 					</div>
 				</div>

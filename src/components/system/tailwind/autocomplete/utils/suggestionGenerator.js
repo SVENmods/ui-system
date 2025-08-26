@@ -1,6 +1,143 @@
 // Suggestion Generator utility functions
 import { cssRules } from './cssGenerator.js'
 
+// Modifier patterns for autocomplete
+export const modifierPatterns = {
+	// Breakpoints
+	breakpoints: ['sm', 'md', 'lg', 'xl', '2xl'],
+	maxBreakpoints: ['max-sm', 'max-md', 'max-lg', 'max-xl', 'max-2xl'],
+	customBreakpoints: ['min-[', 'max-['],
+
+	// Container queries
+	containerQueries: [
+		'@3xs',
+		'@2xs',
+		'@xs',
+		'@sm',
+		'@md',
+		'@lg',
+		'@xl',
+		'@2xl',
+		'@3xl',
+		'@4xl',
+		'@5xl',
+		'@6xl',
+		'@7xl',
+	],
+	maxContainerQueries: [
+		'@max-3xs',
+		'@max-2xs',
+		'@max-xs',
+		'@max-sm',
+		'@max-md',
+		'@max-lg',
+		'@max-xl',
+		'@max-2xl',
+		'@max-3xl',
+		'@max-4xl',
+		'@max-5xl',
+		'@max-6xl',
+		'@max-7xl',
+	],
+	customContainerQueries: ['@min-[', '@max-['],
+
+	// Pseudo-classes
+	pseudoClasses: [
+		'hover',
+		'focus',
+		'focus-within',
+		'focus-visible',
+		'active',
+		'visited',
+		'target',
+		'first',
+		'last',
+		'only',
+		'odd',
+		'even',
+		'first-of-type',
+		'last-of-type',
+		'only-of-type',
+		'empty',
+		'disabled',
+		'enabled',
+		'checked',
+		'indeterminate',
+		'default',
+		'optional',
+		'required',
+		'valid',
+		'invalid',
+		'user-valid',
+		'user-invalid',
+		'in-range',
+		'out-of-range',
+		'placeholder-shown',
+		'details-content',
+		'autofill',
+		'read-only',
+	],
+
+	// Pseudo-elements
+	pseudoElements: [
+		'before',
+		'after',
+		'first-letter',
+		'first-line',
+		'marker',
+		'selection',
+		'file',
+		'backdrop',
+		'placeholder',
+	],
+
+	// Media queries
+	mediaQueries: [
+		'dark',
+		'motion-safe',
+		'motion-reduce',
+		'contrast-more',
+		'contrast-less',
+		'forced-colors',
+		'inverted-colors',
+		'pointer-fine',
+		'pointer-coarse',
+		'pointer-none',
+		'any-pointer-fine',
+		'any-pointer-coarse',
+		'any-pointer-none',
+		'portrait',
+		'landscape',
+		'noscript',
+		'print',
+	],
+
+	// Direction
+	direction: ['rtl', 'ltr'],
+
+	// State
+	state: ['open', 'starting'],
+
+	// Special variants
+	special: ['*', '**'],
+
+	// Complex variants
+	complex: [
+		'has-[',
+		'group-[',
+		'peer-[',
+		'in-[',
+		'not-[',
+		'nth-[',
+		'aria-[',
+		'data-[',
+		'supports-[',
+	],
+
+	// Inert variant
+	inert: ['inert'],
+}
+
 // Tailwind CSS patterns for autocomplete
 export const patterns = {
 	// Layout
@@ -432,6 +569,17 @@ export const specialValues = {
 export const sizePatterns =
 	/^(p|m|w|h|gap|space|rounded|border|text|leading|tracking|top|right|bottom|left|z|order|col-span|row-span|col-start|grid-cols|grid-rows|row-start|basis|flex|grow|shrink|inset|columns|aspect|break-after|break-before|break-inside|box-decoration|box|float|clear|isolation|object|overflow|overscroll|position|visibility|resize)-/
 
+// Parse class name to extract modifiers and base class
+const parseClassName = (className) => {
+	if (!className) return { modifiers: [], baseClass: '' }
+
+	const parts = className.split(':')
+	const baseClass = parts[parts.length - 1]
+	const modifiers = parts.slice(0, -1)
+
+	return { modifiers, baseClass }
+}
+
 // Generate suggestions for Tailwind classes
 export const generateTailwindSuggestions = (input) => {
 	if (!input) return []
@@ -439,19 +587,61 @@ export const generateTailwindSuggestions = (input) => {
 	const suggestions = []
 	const cleanInput = input.toLowerCase()
 
-	// Handle state modifiers like hover:, focus:, etc.
-	const stateModifierMatch = cleanInput.match(
-		/^(hover|focus|active|disabled|group-hover|dark|sm|md|lg|xl|2xl):(.+)$/
-	)
-	if (stateModifierMatch) {
-		const [, modifier, remainingInput] = stateModifierMatch
-		const remainingSuggestions = generateSuggestions(remainingInput)
-		return remainingSuggestions.map(
-			(suggestion) => `${modifier}:${suggestion}`
+	// Parse the input to separate modifiers from base class
+	const { modifiers, baseClass } = parseClassName(cleanInput)
+
+	// If we have modifiers, generate suggestions for the base class and then add modifiers
+	if (modifiers.length > 0) {
+		const baseSuggestions = generateSuggestions(baseClass)
+		return baseSuggestions.map(
+			(suggestion) => `${modifiers.join(':')}:${suggestion}`
 		)
 	}
 
-	return generateSuggestions(cleanInput)
+	// Check if input is a modifier prefix
+	const modifierSuggestions = generateModifierSuggestions(cleanInput)
+	if (modifierSuggestions.length > 0) {
+		suggestions.push(...modifierSuggestions)
+	}
+
+	// Generate regular suggestions
+	const regularSuggestions = generateSuggestions(cleanInput)
+	suggestions.push(...regularSuggestions)
+
+	return [...new Set(suggestions)].slice(0, 50) // Limit to 50 suggestions
+}
+
+// Generate modifier suggestions
+const generateModifierSuggestions = (input) => {
+	const suggestions = []
+
+	// Flatten all modifier patterns
+	const allModifiers = [
+		...modifierPatterns.breakpoints,
+		...modifierPatterns.maxBreakpoints,
+		...modifierPatterns.containerQueries,
+		...modifierPatterns.maxContainerQueries,
+		...modifierPatterns.pseudoClasses,
+		...modifierPatterns.pseudoElements,
+		...modifierPatterns.mediaQueries,
+		...modifierPatterns.direction,
+		...modifierPatterns.state,
+		...modifierPatterns.special,
+		...modifierPatterns.inert,
+	]
+
+	// Add complex variants
+	allModifiers.push(...modifierPatterns.complex)
+
+	// Filter modifiers that start with input
+	const matchingModifiers = allModifiers.filter((modifier) =>
+		modifier.startsWith(input)
+	)
+
+	// Add colon to make them valid modifier suggestions
+	suggestions.push(...matchingModifiers.map((modifier) => `${modifier}:`))
+
+	return suggestions
 }
 
 // Helper function to generate suggestions

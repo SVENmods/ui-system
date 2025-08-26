@@ -16,7 +16,7 @@ import ContextCell from '../components/system/dnd/contextCell'
 import BtnDefault from './../components/ui/group/buttons/default/btnDefault'
 import Toggle from './../components/ui/group/toggle/default/toggle'
 import classNames from 'classnames'
-import TailwindAutocomplete from '../components/system/tailwind/autocomplete'
+import { TailwindAutocomplete } from '../components/system/tailwind/autocomplete'
 
 const TestPage = () => {
 	const [items, setItems] = useState([
