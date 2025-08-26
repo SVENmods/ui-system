@@ -1,8 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import {
-	generateTailwindCSS,
-	generateTailwindSuggestions,
-} from './autocomplete/index.js'
+import { generateTailwindCSS } from './utils/cssGenerator.js'
+import { generateTailwindSuggestions } from './utils/suggestionGenerator.js'
 
 const TailwindAutocomplete = () => {
 	const [inputValue, setInputValue] = useState('')

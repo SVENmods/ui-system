@@ -20,6 +20,7 @@
     "@tailwindcss/vite": "^4.1.7",
     "@uidotdev/usehooks": "^2.4.1",
     "classnames": "^2.5.1",
+    "crypto-js": "^4.2.0",
     "html-prettify": "^1.0.7",
     "html-react-parser": "^5.2.5",
     "html-to-jsx": "^0.0.4",
