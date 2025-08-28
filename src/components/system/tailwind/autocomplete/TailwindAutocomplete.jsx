@@ -112,7 +112,7 @@ const TailwindAutocomplete = () => {
 			{showSuggestions && suggestions.length > 0 && (
 				<div
 					ref={suggestionsRef}
-					className='z-10 absolute bg-white shadow-lg mt-1 border border-gray-300 rounded-md w-full max-h-60 overflow-y-auto'
+					className='z-10 absolute bg-base-300 shadow-lg mt-1 rounded-md w-full max-h-60 overflow-y-auto'
 				>
 					{suggestions.map((suggestion, index) => (
 						<div
@@ -122,8 +122,8 @@ const TailwindAutocomplete = () => {
 							}
 							className={`px-3 py-2 cursor-pointer text-sm ${
 								index === selectedIndex
-									? 'bg-blue-100 text-blue-900'
-									: 'hover:bg-gray-100'
+									? 'bg-base-200 text-blue-400'
+									: 'hover:bg-base-100'
 							}`}
 						>
 							{suggestion}
@@ -144,8 +144,8 @@ const TailwindAutocomplete = () => {
 					>
 						test
 					</div> */}
-					<div className='bg-gray-100 p-3 rounded-md'>
-						<code className='text-gray-800 text-sm'>
+					<div className='bg-base-300 p-3 rounded-md'>
+						<code className='text-sm text-base-content'>
 							{generatedCSS}
 						</code>
 					</div>
@@ -153,11 +153,11 @@ const TailwindAutocomplete = () => {
 			)}
 
 			{/* Instructions */}
-			<div className='bg-blue-50 mt-6 p-4 rounded-md'>
-				<h3 className='mb-2 font-medium text-blue-900 text-sm'>
+			<div className='bg-base-200 mt-6 p-4 rounded-md'>
+				<h3 className='mb-2 font-medium text-blue-500 text-sm'>
 					How to use:
 				</h3>
-				<ul className='space-y-1 text-blue-800 text-sm'>
+				<ul className='space-y-1 text-blue-400 text-sm'>
 					<li>• Type a Tailwind class to see suggestions</li>
 					<li>• Use arrow keys to navigate suggestions</li>
 					<li>• Press Enter to select a suggestion</li>
