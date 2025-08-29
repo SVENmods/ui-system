@@ -1,13 +1,15 @@
+import { TailwindAutocomplete } from '../autocomplete'
+
 const EditorWindow = ({ id }) => {
 	return (
 		<>
 			<div
-				className='bg-sky-600 shadow-sm rounded-box w-52 dropdown menu'
+				className='bg-slate-300 dark:bg-slate-800 shadow-sm rounded-box w-80 dropdown menu'
 				popover='auto'
 				id={`popover-${id}`}
 				style={{ positionAnchor: `--anchor-${id}` }}
 			>
-				Editor Window of {id} item
+				<TailwindAutocomplete />
 			</div>
 		</>
 	)

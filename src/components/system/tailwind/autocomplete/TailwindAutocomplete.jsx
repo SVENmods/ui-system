@@ -90,7 +90,7 @@ const TailwindAutocomplete = () => {
 			<div className='mb-4'>
 				<label
 					htmlFor='tailwind-input'
-					className='block mb-2 font-medium text-gray-700 text-sm'
+					className='block mb-2 font-medium text-sm text-base-content'
 				>
 					Tailwind CSS Class
 				</label>

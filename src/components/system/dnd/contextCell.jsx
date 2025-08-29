@@ -1,7 +1,13 @@
 import * as ContextMenu from '@radix-ui/react-context-menu'
 import classNames from 'classnames'
 
-const ContextCell = ({ children, editMode, id }) => {
+const ContextCell = ({
+	children,
+	editMode,
+	id,
+	deleteElement,
+	duplicateElement,
+}) => {
 	const itemClass =
 		'group relative flex items-center data-[highlighted]:bg-base-300 pr-[5px] pl-[25px] rounded-[3px] outline-none h-[25px] text-[13px] text-base-content leading-none cursor-pointer select-none data-[disabled]:text-gray-500 data-[disabled]:cursor-not-allowed gap-2'
 
@@ -52,6 +58,7 @@ const ContextCell = ({ children, editMode, id }) => {
 					</ContextMenu.Item>
 					<ContextMenu.Item
 						className={classNames('text-red-500', itemClass)}
+						onSelect={deleteElement}
 					>
 						<span>Delete element</span>
 						<svg
@@ -69,7 +76,10 @@ const ContextCell = ({ children, editMode, id }) => {
 							/>
 						</svg>
 					</ContextMenu.Item>
-					<ContextMenu.Item className={classNames(itemClass)}>
+					<ContextMenu.Item
+						className={classNames(itemClass)}
+						onSelect={duplicateElement}
+					>
 						<span>Duplicate element</span>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'

@@ -16,7 +16,6 @@ import ContextCell from '../components/system/dnd/contextCell'
 import BtnDefault from './../components/ui/group/buttons/default/btnDefault'
 import Toggle from './../components/ui/group/toggle/default/toggle'
 import classNames from 'classnames'
-import { TailwindAutocomplete } from '../components/system/tailwind/autocomplete'
 import EditorWindow from '../components/system/tailwind/components/editorWindow'
 
 const TestPage = () => {
@@ -105,6 +104,66 @@ const TestPage = () => {
 								editMode={editMode}
 								viewMode={viewMode}
 								id={index}
+								deleteElement={() => {
+									setItems((prevItems) =>
+										prevItems.filter(
+											(element) =>
+												element.id !==
+												item.id
+										)
+									)
+								}}
+								duplicateElement={() => {
+									setItems((prevItems) => {
+										// Find the maximum numeric ID in the list
+										const maxId = Math.max(
+											...prevItems
+												.map(
+													(i) =>
+														parseInt(
+															i.id
+														) || 0
+												)
+												.filter(
+													(id) =>
+														!isNaN(id)
+												),
+											0
+										)
+										const newId = (
+											maxId + 1
+										).toString()
+
+										// Find the rightmost position in the grid
+										const maxX = Math.max(
+											...prevItems.map(
+												(i) => i.position.x
+											),
+											0
+										)
+										const maxY = Math.max(
+											...prevItems.map(
+												(i) => i.position.y
+											),
+											0
+										)
+
+										const newPosition = {
+											x: maxX + 1,
+											y: maxY,
+										}
+
+										return [
+											...prevItems,
+											{
+												...item,
+												id: newId,
+												position:
+													newPosition,
+											},
+										]
+									})
+								}}
 							>
 								<GridItem
 									id={item.id}
@@ -324,9 +383,7 @@ const TestPage = () => {
 								</DragOverlay>
 							</DndContext>
 						</div>
-						<div className='mt-5'>
-							<TailwindAutocomplete />
-						</div>
+						<div className='mt-5'></div>
 					</div>
 				</div>
 			</main>

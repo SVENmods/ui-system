@@ -4,7 +4,8 @@
 	--base-content: black;
 	--base-600: #ff0000;
 }
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
 :root {
 	font-size: 16px;
