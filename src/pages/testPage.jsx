@@ -17,6 +17,7 @@ import BtnDefault from './../components/ui/group/buttons/default/btnDefault'
 import Toggle from './../components/ui/group/toggle/default/toggle'
 import classNames from 'classnames'
 import { TailwindAutocomplete } from '../components/system/tailwind/autocomplete'
+import EditorWindow from '../components/system/tailwind/components/editorWindow'
 
 const TestPage = () => {
 	const [items, setItems] = useState([
@@ -99,18 +100,24 @@ const TestPage = () => {
 					viewMode={viewMode}
 				>
 					{item && (
-						<ContextCell
-							editMode={editMode}
-							viewMode={viewMode}
-						>
-							<GridItem
-								id={item.id}
+						<>
+							<ContextCell
 								editMode={editMode}
 								viewMode={viewMode}
+								id={index}
 							>
-								{item.content ? item.content : item.id}
-							</GridItem>
-						</ContextCell>
+								<GridItem
+									id={item.id}
+									editMode={editMode}
+									viewMode={viewMode}
+								>
+									{item.content
+										? item.content
+										: item.id}
+								</GridItem>
+							</ContextCell>
+							<EditorWindow id={index} />
+						</>
 					)}
 				</GridCell>
 			)

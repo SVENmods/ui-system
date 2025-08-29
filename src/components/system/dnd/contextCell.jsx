@@ -1,18 +1,17 @@
 import * as ContextMenu from '@radix-ui/react-context-menu'
-import { useState } from 'react'
 import classNames from 'classnames'
 
-const ContextCell = ({ children, editMode }) => {
-	const [bookmarksChecked, setBookmarksChecked] = useState(true)
-	const [urlsChecked, setUrlsChecked] = useState(false)
-	const [person, setPerson] = useState('pedro')
-
+const ContextCell = ({ children, editMode, id }) => {
 	const itemClass =
-		'group relative flex items-center data-[highlighted]:bg-base-300 pr-[5px] pl-[25px] rounded-[3px] outline-none h-[25px] text-[13px] text-base-content leading-none cursor-pointer select-none data-[disabled]:text-gray-500 data-[disabled]:cursor-not-allowed'
+		'group relative flex items-center data-[highlighted]:bg-base-300 pr-[5px] pl-[25px] rounded-[3px] outline-none h-[25px] text-[13px] text-base-content leading-none cursor-pointer select-none data-[disabled]:text-gray-500 data-[disabled]:cursor-not-allowed gap-2'
 
 	return (
 		<ContextMenu.Root>
-			<ContextMenu.Trigger disabled={!editMode} className=''>
+			<ContextMenu.Trigger
+				disabled={!editMode}
+				className=''
+				style={{ anchorName: `--anchor-${id}` }}
+			>
 				{children}
 			</ContextMenu.Trigger>
 			<ContextMenu.Portal>
@@ -21,159 +20,92 @@ const ContextCell = ({ children, editMode }) => {
 					sideOffset={5}
 					align='end'
 				>
+					<ContextMenu.Item
+						className={classNames(itemClass)}
+						onSelect={() => {
+							const pop = document.getElementById(
+								`popover-${id}`
+							)
+							if (
+								pop &&
+								typeof pop.showPopover === 'function'
+							) {
+								pop.showPopover()
+							}
+						}}
+					>
+						<span>Tailwind Editor</span>
+						<svg
+							xmlns='http://www.w3.org/2000/svg'
+							fill='none'
+							viewBox='0 0 24 24'
+							strokeWidth={1.5}
+							stroke='currentColor'
+							className='size-4'
+						>
+							<path
+								strokeLinecap='round'
+								strokeLinejoin='round'
+								d='m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10'
+							/>
+						</svg>
+					</ContextMenu.Item>
+					<ContextMenu.Item
+						className={classNames('text-red-500', itemClass)}
+					>
+						<span>Delete element</span>
+						<svg
+							xmlns='http://www.w3.org/2000/svg'
+							fill='none'
+							viewBox='0 0 24 24'
+							strokeWidth={1.5}
+							stroke='currentColor'
+							className='size-4'
+						>
+							<path
+								strokeLinecap='round'
+								strokeLinejoin='round'
+								d='m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0'
+							/>
+						</svg>
+					</ContextMenu.Item>
 					<ContextMenu.Item className={classNames(itemClass)}>
-						Back <div className='ml-auto pl-5'>⌘+[</div>
+						<span>Duplicate element</span>
+						<svg
+							xmlns='http://www.w3.org/2000/svg'
+							fill='none'
+							viewBox='0 0 24 24'
+							strokeWidth={1.5}
+							stroke='currentColor'
+							className='size-4'
+						>
+							<path
+								strokeLinecap='round'
+								strokeLinejoin='round'
+								d='M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6'
+							/>
+						</svg>
 					</ContextMenu.Item>
 					<ContextMenu.Item
 						className={classNames(itemClass)}
 						disabled
 					>
-						Forward{' '}
-						<div className='ml-auto pl-5 text-mauve11 group-data-[disabled]:text-mauve8 group-data-[highlighted]:text-white'>
-							⌘+]
-						</div>
+						<span>Edit text</span>
+						<svg
+							xmlns='http://www.w3.org/2000/svg'
+							fill='none'
+							viewBox='0 0 24 24'
+							strokeWidth={1.5}
+							stroke='currentColor'
+							className='size-4'
+						>
+							<path
+								strokeLinecap='round'
+								strokeLinejoin='round'
+								d='M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5'
+							/>
+						</svg>
 					</ContextMenu.Item>
-					<ContextMenu.Item className={classNames(itemClass)}>
-						Reload <div className='ml-auto pl-5'>⌘+R</div>
-					</ContextMenu.Item>
-					<ContextMenu.Sub>
-						<ContextMenu.SubTrigger
-							className={classNames(itemClass)}
-						>
-							More Tools
-							<div className='ml-auto pl-5 text-mauve11 group-data-[disabled]:text-mauve8 group-data-[highlighted]:text-base-content'>
-								<svg
-									xmlns='http://www.w3.org/2000/svg'
-									fill='none'
-									viewBox='0 0 24 24'
-									strokeWidth={1.5}
-									stroke='currentColor'
-									className='size-4'
-								>
-									<path
-										strokeLinecap='round'
-										strokeLinejoin='round'
-										d='m8.25 4.5 7.5 7.5-7.5 7.5'
-									/>
-								</svg>
-							</div>
-						</ContextMenu.SubTrigger>
-						<ContextMenu.Portal>
-							<ContextMenu.SubContent
-								className='bg-base-200 shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),_0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)] p-[5px] rounded-md min-w-[220px] overflow-hidden'
-								sideOffset={2}
-								alignOffset={-5}
-							>
-								<ContextMenu.Item
-									className={classNames(itemClass)}
-								>
-									Save Page As…{' '}
-									<div className='ml-auto pl-5'>
-										⌘+S
-									</div>
-								</ContextMenu.Item>
-								<ContextMenu.Item
-									className={classNames(itemClass)}
-								>
-									Create Shortcut…
-								</ContextMenu.Item>
-								<ContextMenu.Item
-									className={classNames(itemClass)}
-								>
-									Name Window…
-								</ContextMenu.Item>
-								<ContextMenu.Separator className='bg-base-content m-[5px] h-px' />
-								<ContextMenu.Item
-									className={classNames(itemClass)}
-								>
-									Developer Tools
-								</ContextMenu.Item>
-							</ContextMenu.SubContent>
-						</ContextMenu.Portal>
-					</ContextMenu.Sub>
-
-					<ContextMenu.Separator className='bg-base-content m-[5px] h-px' />
-
-					<ContextMenu.CheckboxItem
-						className={classNames(itemClass)}
-						checked={bookmarksChecked}
-						onCheckedChange={setBookmarksChecked}
-					>
-						<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
-							<svg
-								xmlns='http://www.w3.org/2000/svg'
-								fill='none'
-								viewBox='0 0 24 24'
-								strokeWidth={1.5}
-								stroke='currentColor'
-								className='size-4'
-							>
-								<path
-									strokeLinecap='round'
-									strokeLinejoin='round'
-									d='m4.5 12.75 6 6 9-13.5'
-								/>
-							</svg>
-						</ContextMenu.ItemIndicator>
-						Show Bookmarks{' '}
-						<div className='ml-auto pl-5'>⌘+B</div>
-					</ContextMenu.CheckboxItem>
-					<ContextMenu.CheckboxItem
-						className={classNames(itemClass)}
-						checked={urlsChecked}
-						onCheckedChange={setUrlsChecked}
-					>
-						<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
-							<svg
-								xmlns='http://www.w3.org/2000/svg'
-								fill='none'
-								viewBox='0 0 24 24'
-								strokeWidth={1.5}
-								stroke='currentColor'
-								className='size-4'
-							>
-								<path
-									strokeLinecap='round'
-									strokeLinejoin='round'
-									d='m4.5 12.75 6 6 9-13.5'
-								/>
-							</svg>
-						</ContextMenu.ItemIndicator>
-						Show Full URLs
-					</ContextMenu.CheckboxItem>
-
-					<ContextMenu.Separator className='bg-base-content m-[5px] h-px' />
-
-					<ContextMenu.Label className='pl-[25px] text-mauve11 text-xs leading-[25px]'>
-						People
-					</ContextMenu.Label>
-					<ContextMenu.RadioGroup
-						value={person}
-						onValueChange={setPerson}
-					>
-						<ContextMenu.RadioItem
-							className={classNames(itemClass)}
-							value='pedro'
-						>
-							<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
-								<span className='text-[.5rem]'>
-									{'\u2B24'}
-								</span>
-							</ContextMenu.ItemIndicator>
-							Pedro Duarte
-						</ContextMenu.RadioItem>
-						<ContextMenu.RadioItem
-							className={classNames(itemClass)}
-							value='colm'
-						>
-							<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
-								<span className='text-[.5rem]'>
-									{'\u2B24'}
-								</span>
-							</ContextMenu.ItemIndicator>
-							Colm Tuite
-						</ContextMenu.RadioItem>
-					</ContextMenu.RadioGroup>
 				</ContextMenu.Content>
 			</ContextMenu.Portal>
 		</ContextMenu.Root>
