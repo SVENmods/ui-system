@@ -17,6 +17,7 @@ import BtnDefault from './../components/ui/group/buttons/default/btnDefault'
 import Toggle from './../components/ui/group/toggle/default/toggle'
 import classNames from 'classnames'
 import EditorWindow from '../components/system/tailwind/components/editorWindow'
+import ModalDnd from '../components/system/dnd/modalDnd'
 
 const TestPage = () => {
 	const [items, setItems] = useState([
@@ -130,9 +131,12 @@ const TestPage = () => {
 												),
 											0
 										)
+										console.log('maxId', maxId)
+
 										const newId = (
 											maxId + 1
 										).toString()
+										console.log('newId', newId)
 
 										// Find the rightmost position in the grid
 										const maxX = Math.max(
@@ -311,6 +315,7 @@ const TestPage = () => {
 				<div className='flex flex-row flex-wrap lg:flex-nowrap items-start content-start gap-x-6 pt-2 w-full h-full'>
 					<SideNav className={'lg:w-[20%] w-full'} />
 					<div className='w-full lg:w-[80%]'>
+						<ModalDnd />
 						<div className='flex items-center gap-4'>
 							<div className='flex items-center gap-2'>
 								<span className='font-medium text-sm'>
