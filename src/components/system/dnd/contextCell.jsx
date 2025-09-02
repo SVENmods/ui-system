@@ -1,5 +1,6 @@
 import * as ContextMenu from '@radix-ui/react-context-menu'
 import classNames from 'classnames'
+import React from 'react'
 
 const ContextCell = ({
 	children,
@@ -7,17 +8,14 @@ const ContextCell = ({
 	id,
 	deleteElement,
 	duplicateElement,
+	setFocusModeFlag,
 }) => {
 	const itemClass =
 		'group relative flex items-center data-[highlighted]:bg-base-300 pr-[5px] pl-[25px] rounded-[3px] outline-none h-[25px] text-[13px] text-base-content leading-none cursor-pointer select-none data-[disabled]:text-gray-500 data-[disabled]:cursor-not-allowed gap-2'
 
 	return (
 		<ContextMenu.Root>
-			<ContextMenu.Trigger
-				disabled={!editMode}
-				className=''
-				style={{ anchorName: `--anchor-${id}` }}
-			>
+			<ContextMenu.Trigger disabled={!editMode} className=''>
 				{children}
 			</ContextMenu.Trigger>
 			<ContextMenu.Portal>
@@ -29,14 +27,30 @@ const ContextCell = ({
 					<ContextMenu.Item
 						className={classNames(itemClass)}
 						onSelect={() => {
-							const pop = document.getElementById(
-								`popover-${id}`
+							const modal = document.getElementById(
+								`dialog-area-${id}`
 							)
+
+							const cellBox = document.querySelector(
+								`#cell-${id}`
+							)
+
+							const childrenCoordinates =
+								cellBox.getBoundingClientRect()
+							console.log('children', childrenCoordinates)
 							if (
-								pop &&
-								typeof pop.showPopover === 'function'
+								modal &&
+								typeof modal.showModal === 'function'
 							) {
-								pop.showPopover()
+								modal.showModal()
+								setFocusModeFlag(true)
+								const modalBox = document.querySelector(
+									`#modal-box-${id}`
+								)
+								modalBox.style.transform = `translate3d(${0}px, ${0}px, 0px)`
+								console.log(
+									`translate3d(${childrenCoordinates.left}px, ${childrenCoordinates.top}px, 0px)`
+								)
 							}
 						}}
 					>

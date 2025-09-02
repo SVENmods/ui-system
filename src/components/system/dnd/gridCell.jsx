@@ -3,7 +3,14 @@ import classNames from 'classnames'
 import { memo } from 'react'
 
 const GridCell = memo(
-	({ id, children, isLastRow, editMode = false, viewMode = false }) => {
+	({
+		id,
+		children,
+		isLastRow,
+		editMode = false,
+		viewMode = false,
+		focusModeFlag = false,
+	}) => {
 		const { isOver, setNodeRef } = useDroppable({
 			id: `cell-${id}`,
 			disabled: !editMode,
@@ -21,8 +28,10 @@ const GridCell = memo(
 						// '': !isLastRow && editMode,
 						'border border-dashed border-base-content':
 							viewMode && editMode && !isLastRow,
+						'bg-red-500': editMode && focusModeFlag,
 					}
 				)}
+				id={`cell-${id}`}
 			>
 				{children}
 			</div>

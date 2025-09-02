@@ -1,10 +1,11 @@
 import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import TailwindAutocomplete from './../tailwind/autocomplete/TailwindAutocomplete'
 
 // Draggable modal-box component
-const DraggableModalBox = ({ children, position }) => {
+const DraggableModalBox = ({ children, position, id }) => {
 	const { attributes, listeners, setNodeRef, transform } = useDraggable({
-		id: 'modal-box',
+		id: `modal-box-${id}`,
 	})
 
 	const style = {
@@ -15,24 +16,40 @@ const DraggableModalBox = ({ children, position }) => {
 		<div
 			ref={setNodeRef}
 			style={style}
-			{...listeners}
-			{...attributes}
-			className='cursor-move select-none modal-box'
+			className='modal-box'
+			id={`modal-box-${id}`}
 		>
-			{children}
+			{/* Drag handle - only this area is draggable */}
+			<div
+				{...listeners}
+				{...attributes}
+				className='flex justify-center items-center px-4 pb-2 border-gray-300 cursor-move select-none'
+			>
+				<div className='flex space-x-1'>
+					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+				</div>
+			</div>
+
+			{/* Modal content - not draggable */}
+			<div className=''>{children}</div>
 		</div>
 	)
 }
 
 // Droppable dialog area
-const DroppableDialog = ({ children }) => {
+const DroppableDialog = ({ children, id }) => {
 	const { setNodeRef } = useDroppable({
-		id: 'dialog-area',
+		id: `dialog-area-${id}`,
 	})
 
 	return (
 		<dialog
-			id='my_modal_2'
+			id={`dialog-area-${id}`}
 			className='open:bg-transparent modal'
 			ref={setNodeRef}
 		>
@@ -41,16 +58,50 @@ const DroppableDialog = ({ children }) => {
 	)
 }
 
-const ModalDnd = () => {
+const ModalDnd = ({ id, setFocusModeFlag }) => {
 	const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 })
 
-	const handleOpenModal = () => {
-		document.getElementById('my_modal_2').showModal()
+	const handleCloseModal = () => {
+		document.getElementById(`dialog-area-${id}`).close()
+		setFocusModeFlag(false)
 	}
 
-	const handleCloseModal = () => {
-		document.getElementById('my_modal_2').close()
-	}
+	// Обработчик для закрытия модального окна при нажатии ESC
+	useEffect(() => {
+		const handleKeyDown = (event) => {
+			if (event.key === 'Escape') {
+				const modal = document.getElementById(`dialog-area-${id}`)
+				if (modal && modal.open) {
+					modal.close()
+					setFocusModeFlag(false)
+				}
+			}
+		}
+
+		document.addEventListener('keydown', handleKeyDown)
+		return () => {
+			document.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [id, setFocusModeFlag])
+
+	// Обработчик для закрытия модального окна при клике вне области
+	useEffect(() => {
+		const handleClickOutside = (event) => {
+			const modal = document.getElementById(`dialog-area-${id}`)
+			if (modal && modal.open && event.target === modal) {
+				modal.close()
+				setFocusModeFlag(false)
+			}
+		}
+
+		const modal = document.getElementById(`dialog-area-${id}`)
+		if (modal) {
+			modal.addEventListener('click', handleClickOutside)
+			return () => {
+				modal.removeEventListener('click', handleClickOutside)
+			}
+		}
+	}, [id, setFocusModeFlag])
 
 	const handleDragEnd = (event) => {
 		const { delta } = event
@@ -63,25 +114,18 @@ const ModalDnd = () => {
 	return (
 		<>
 			{/* Open the modal using document.getElementById('ID').showModal() method */}
-			<button className='btn' onClick={handleOpenModal}>
+			{/* <button
+				className='btn'
+				onClick={handleOpenModal}
+				id={`open-modal-${id}`}
+			>
 				open modal
-			</button>
+			</button> */}
 
 			<DndContext onDragEnd={handleDragEnd}>
-				<DroppableDialog>
-					<DraggableModalBox position={modalPosition}>
-						<h3 className='font-bold text-lg'>Hello!</h3>
-						<p className='py-4'>
-							Press ESC key or click outside to close
-						</p>
-						<div className='modal-action'>
-							<button
-								className='btn btn-primary'
-								onClick={handleCloseModal}
-							>
-								Close
-							</button>
-						</div>
+				<DroppableDialog id={id}>
+					<DraggableModalBox position={modalPosition} id={id}>
+						<TailwindAutocomplete id={id} />
 					</DraggableModalBox>
 					<form method='dialog' className='modal-backdrop'>
 						<button onClick={handleCloseModal}>close</button>
