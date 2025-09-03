@@ -9,6 +9,7 @@ const ContextCell = ({
 	deleteElement,
 	duplicateElement,
 	setFocusModeFlag,
+	setModalPosition,
 }) => {
 	const itemClass =
 		'group relative flex items-center data-[highlighted]:bg-base-300 pr-[5px] pl-[25px] rounded-[3px] outline-none h-[25px] text-[13px] text-base-content leading-none cursor-pointer select-none data-[disabled]:text-gray-500 data-[disabled]:cursor-not-allowed gap-2'
@@ -37,20 +38,20 @@ const ContextCell = ({
 
 							const childrenCoordinates =
 								cellBox.getBoundingClientRect()
-							console.log('children', childrenCoordinates)
+							const cellBoxHeight = cellBox.clientHeight
 							if (
 								modal &&
 								typeof modal.showModal === 'function'
 							) {
 								modal.showModal()
 								setFocusModeFlag(true)
-								const modalBox = document.querySelector(
-									`#modal-box-${id}`
-								)
-								modalBox.style.transform = `translate3d(${0}px, ${0}px, 0px)`
-								console.log(
-									`translate3d(${childrenCoordinates.left}px, ${childrenCoordinates.top}px, 0px)`
-								)
+								setModalPosition({
+									x: childrenCoordinates.left,
+									y:
+										childrenCoordinates.top +
+										cellBoxHeight +
+										8,
+								})
 							}
 						}}
 					>

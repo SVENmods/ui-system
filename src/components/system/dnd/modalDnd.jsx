@@ -1,5 +1,5 @@
 import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import TailwindAutocomplete from './../tailwind/autocomplete/TailwindAutocomplete'
 
 // Draggable modal-box component
@@ -16,7 +16,7 @@ const DraggableModalBox = ({ children, position, id }) => {
 		<div
 			ref={setNodeRef}
 			style={style}
-			className='modal-box'
+			className='group border hover:border-sky-800 border-transparent h-fit transition-[border] duration-300 modal-box'
 			id={`modal-box-${id}`}
 		>
 			{/* Drag handle - only this area is draggable */}
@@ -25,13 +25,23 @@ const DraggableModalBox = ({ children, position, id }) => {
 				{...attributes}
 				className='flex justify-center items-center px-4 pb-2 border-gray-300 cursor-move select-none'
 			>
-				<div className='flex space-x-1'>
-					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
-					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
-					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
-					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
-					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
-					<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+				<div className='flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+					<div className='flex space-x-0.5'>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+					</div>
+					<div className='flex space-x-0.5'>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+						<div className='bg-gray-400 rounded-full w-1 h-1'></div>
+					</div>
 				</div>
 			</div>
 
@@ -50,17 +60,22 @@ const DroppableDialog = ({ children, id }) => {
 	return (
 		<dialog
 			id={`dialog-area-${id}`}
-			className='open:bg-transparent modal'
+			className='justify-stretch open:bg-transparent modal'
 			ref={setNodeRef}
+			style={{ alignItems: 'inherit', justifyItems: 'inherit' }}
 		>
 			{children}
 		</dialog>
 	)
 }
 
-const ModalDnd = ({ id, setFocusModeFlag }) => {
-	const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 })
-
+const ModalDnd = ({
+	id,
+	setFocusModeFlag,
+	modalPosition,
+	setModalPosition,
+	itemId,
+}) => {
 	const handleCloseModal = () => {
 		document.getElementById(`dialog-area-${id}`).close()
 		setFocusModeFlag(false)
@@ -105,9 +120,9 @@ const ModalDnd = ({ id, setFocusModeFlag }) => {
 
 	const handleDragEnd = (event) => {
 		const { delta } = event
-		setModalPosition((prev) => ({
-			x: prev.x + delta.x,
-			y: prev.y + delta.y,
+		setModalPosition((modalPosition) => ({
+			x: modalPosition.x + delta.x,
+			y: modalPosition.y + delta.y,
 		}))
 	}
 
@@ -125,7 +140,7 @@ const ModalDnd = ({ id, setFocusModeFlag }) => {
 			<DndContext onDragEnd={handleDragEnd}>
 				<DroppableDialog id={id}>
 					<DraggableModalBox position={modalPosition} id={id}>
-						<TailwindAutocomplete id={id} />
+						<TailwindAutocomplete id={id} itemId={itemId} />
 					</DraggableModalBox>
 					<form method='dialog' className='modal-backdrop'>
 						<button onClick={handleCloseModal}>close</button>

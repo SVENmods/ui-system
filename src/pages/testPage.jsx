@@ -17,6 +17,9 @@ import BtnDefault from './../components/ui/group/buttons/default/btnDefault'
 import Toggle from './../components/ui/group/toggle/default/toggle'
 import classNames from 'classnames'
 import ModalDnd from '../components/system/dnd/modalDnd'
+import { DeleteElement } from '../components/system/dnd/deleteElement'
+import { DuplicateElement } from '../components/system/dnd/duplicateElement'
+import { useHandleDragEnd } from '../components/system/dnd/hooks/useHandleDragEnd'
 
 const TestPage = () => {
 	const [items, setItems] = useState([
@@ -82,6 +85,8 @@ const TestPage = () => {
 
 	const [focusedCellId, setFocusedCellId] = useState(null)
 
+	const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 })
+
 	// Мемоизируем рендеринг ячеек сетки
 	const gridCells = useMemo(() => {
 		return Array.from({ length: 12 * gridRows }, (_, index) => {
@@ -108,73 +113,18 @@ const TestPage = () => {
 								viewMode={viewMode}
 								id={index}
 								deleteElement={() => {
-									setItems((prevItems) =>
-										prevItems.filter(
-											(element) =>
-												element.id !==
-												item.id
-										)
-									)
+									DeleteElement(setItems, item)
 								}}
 								duplicateElement={() => {
-									setItems((prevItems) => {
-										// Find the maximum numeric ID in the list
-										const maxId = Math.max(
-											...prevItems
-												.map(
-													(i) =>
-														parseInt(
-															i.id
-														) || 0
-												)
-												.filter(
-													(id) =>
-														!isNaN(id)
-												),
-											0
-										)
-										console.log('maxId', maxId)
-
-										const newId = (
-											maxId + 1
-										).toString()
-										console.log('newId', newId)
-
-										// Find the rightmost position in the grid
-										const maxX = Math.max(
-											...prevItems.map(
-												(i) => i.position.x
-											),
-											0
-										)
-										const maxY = Math.max(
-											...prevItems.map(
-												(i) => i.position.y
-											),
-											0
-										)
-
-										const newPosition = {
-											x: maxX + 1,
-											y: maxY,
-										}
-
-										return [
-											...prevItems,
-											{
-												...item,
-												id: newId,
-												position:
-													newPosition,
-											},
-										]
-									})
+									DuplicateElement(setItems, item)
 								}}
 								setFocusModeFlag={(isFocused) => {
 									setFocusedCellId(
 										isFocused ? index : null
 									)
 								}}
+								modalPosition={modalPosition}
+								setModalPosition={setModalPosition}
 							>
 								<GridItem
 									id={item.id}
@@ -196,13 +146,16 @@ const TestPage = () => {
 										isFocused ? index : null
 									)
 								}}
+								modalPosition={modalPosition}
+								setModalPosition={setModalPosition}
+								itemId={item.id}
 							/>
 						</>
 					)}
 				</GridCell>
 			)
 		})
-	}, [items, gridRows, editMode, viewMode, focusedCellId])
+	}, [items, gridRows, editMode, viewMode, focusedCellId, modalPosition])
 
 	const handleDragStart = useCallback(
 		(event) => {
@@ -233,97 +186,12 @@ const TestPage = () => {
 		[maxY, editMode]
 	)
 
-	const handleDragEnd = useCallback(
-		(event) => {
-			if (!editMode) return
-			const { active, over } = event
-			// console.log('Drag ended:', {
-			// 	activeId: active.id,
-			// 	overId: over?.id,
-			// })
-
-			if (over?.id && over.id.startsWith('cell-')) {
-				const cellId = over.id
-				const cellIndex = parseInt(cellId.replace('cell-', ''))
-				const x = cellIndex % 12
-				const y = Math.floor(cellIndex / 12)
-
-				// console.log('Target position:', { x, y })
-
-				// Позволяем перемещать элементы на любую позицию в пределах расширенной сетки
-				if (x >= 0 && x < 12 && y >= 0 && y < gridRows) {
-					setItems((prevItems) => {
-						// Находим перетаскиваемый элемент
-						const draggedItem = prevItems.find(
-							(item) => item.id === active.id
-						)
-
-						if (!draggedItem) return prevItems
-
-						const oldPosition = draggedItem.position
-						const newPosition = { x, y }
-
-						// console.log('Moving item:', {
-						// 	id: active.id,
-						// 	from: oldPosition,
-						// 	to: newPosition,
-						// })
-
-						// Если позиция не изменилась, ничего не делаем
-						if (
-							oldPosition.x === newPosition.x &&
-							oldPosition.y === newPosition.y
-						) {
-							return prevItems
-						}
-
-						// Находим элемент, который уже находится на целевой позиции
-						const targetItem = prevItems.find(
-							(item) =>
-								item.position.x === x &&
-								item.position.y === y
-						)
-
-						if (targetItem) {
-							// console.log(
-							// 	'Swapping with item:',
-							// 	targetItem.id
-							// )
-							// Обмениваем позиции элементов
-							return prevItems.map((item) => {
-								if (item.id === active.id) {
-									return {
-										...item,
-										position: newPosition,
-									}
-								} else if (item.id === targetItem.id) {
-									return {
-										...item,
-										position: oldPosition,
-									}
-								}
-								return item
-							})
-						} else {
-							// console.log('Moving to empty position')
-							// Просто перемещаем элемент на пустую позицию
-							return prevItems.map((item) =>
-								item.id === active.id
-									? {
-											...item,
-											position: newPosition,
-										}
-									: item
-							)
-						}
-					})
-				}
-			}
-
-			setActiveId(null)
-			setDragOverY(null)
-		},
-		[gridRows, editMode]
+	const handleDragEnd = useHandleDragEnd(
+		setItems,
+		setActiveId,
+		setDragOverY,
+		gridRows,
+		editMode
 	)
 
 	return (

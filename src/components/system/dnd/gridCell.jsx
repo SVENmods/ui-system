@@ -28,7 +28,8 @@ const GridCell = memo(
 						// '': !isLastRow && editMode,
 						'border border-dashed border-base-content':
 							viewMode && editMode && !isLastRow,
-						'bg-red-500': editMode && focusModeFlag,
+						'border-4 border-slate-500/50 border-double':
+							editMode && focusModeFlag,
 					}
 				)}
 				id={`cell-${id}`}

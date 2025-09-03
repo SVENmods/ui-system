@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { generateTailwindCSS } from './utils/cssGenerator.js'
 import { generateTailwindSuggestions } from './utils/suggestionGenerator.js'
 
-const TailwindAutocomplete = ({ id }) => {
+const TailwindAutocomplete = ({ id, itemId }) => {
 	const [inputValue, setInputValue] = useState('')
 	const [suggestions, setSuggestions] = useState([])
 	const [showSuggestions, setShowSuggestions] = useState(false)
@@ -87,7 +87,13 @@ const TailwindAutocomplete = ({ id }) => {
 
 	return (
 		<div className='relative w-full max-w-md'>
-			<span>{id}</span>
+			<span>
+				cell ID: <b>{id}</b>
+			</span>
+			<br />
+			<span>
+				item ID: <b>{itemId}</b>
+			</span>
 			<div className='mb-4'>
 				<label
 					htmlFor='tailwind-input'
