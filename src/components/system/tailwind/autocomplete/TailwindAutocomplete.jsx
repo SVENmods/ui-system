@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { generateTailwindCSS } from './utils/cssGenerator.js'
 import { generateTailwindSuggestions } from './utils/suggestionGenerator.js'
+import { MD5 } from 'crypto-js'
 
 const TailwindAutocomplete = ({ id, itemId }) => {
 	const [inputValue, setInputValue] = useState('')
@@ -87,13 +88,17 @@ const TailwindAutocomplete = ({ id, itemId }) => {
 
 	return (
 		<div className='relative w-full max-w-md'>
-			<span>
-				cell ID: <b>{id}</b>
-			</span>
-			<br />
-			<span>
-				item ID: <b>{itemId}</b>
-			</span>
+			<div className='flex flex-col gap-2'>
+				<span>
+					cell ID: <b>{id}</b>
+				</span>
+				<span>
+					item ID: <b>{itemId}</b>
+				</span>
+				<span>
+					item ID in hash: <b>{MD5(itemId).toString()}</b>
+				</span>
+			</div>
 			<div className='mb-4'>
 				<label
 					htmlFor='tailwind-input'

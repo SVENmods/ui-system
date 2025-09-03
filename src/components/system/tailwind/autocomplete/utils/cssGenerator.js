@@ -5,6 +5,7 @@ import { layoutRules } from '../rules/layout.js'
 import { flexboxRules } from '../rules/flexbox.js'
 import { typographyRules } from '../rules/typography.js'
 import { borderRules } from '../rules/borders.js'
+import { effectsRules } from '../rules/effects.js'
 
 // Combine all CSS rules into one object
 export const cssRules = {
@@ -13,6 +14,7 @@ export const cssRules = {
 	...flexboxRules,
 	...typographyRules,
 	...borderRules,
+	...effectsRules,
 }
 
 // CSS properties mapping for arbitrary values
@@ -762,6 +764,20 @@ export const generateTailwindCSS = (className) => {
 			}
 		}
 
+		// Handle group-hover, group-focus, etc. variants
+		if (modifier.startsWith('group-')) {
+			const groupModifier = modifier.replace('group-', '')
+			if (variants[groupModifier]) {
+				// For group-hover, we need special handling
+				if (groupModifier === 'hover') {
+					result = `&:is(:where(.group):hover *) {\n    @media (hover: hover) {\n        ${result}\n    }\n}`
+				} else {
+					result = `&:is(:where(.group)${variants[groupModifier].replace('&:', '')} *) {\n    ${result}\n}`
+				}
+				continue
+			}
+		}
+
 		// Handle peer-[...] variants
 		if (modifier.startsWith('peer-[')) {
 			const value = modifier.match(/peer-\[([^\]]+)\]/)?.[1]
@@ -848,6 +864,17 @@ export const generateTailwindCSS = (className) => {
 				} else {
 					modernWithModifiers = `${variants[modifier]} {\n    ${modernWithModifiers}\n}`
 					fallbackWithModifiers = `${variants[modifier]} {\n    ${fallbackWithModifiers}\n}`
+				}
+			} else if (modifier.startsWith('group-')) {
+				const groupModifier = modifier.replace('group-', '')
+				if (variants[groupModifier]) {
+					if (groupModifier === 'hover') {
+						modernWithModifiers = `&:is(:where(.group):hover *) {\n    @media (hover: hover) {\n        ${modernWithModifiers}\n    }\n}`
+						fallbackWithModifiers = `&:is(:where(.group):hover *) {\n    @media (hover: hover) {\n        ${fallbackWithModifiers}\n    }\n}`
+					} else {
+						modernWithModifiers = `&:is(:where(.group)${variants[groupModifier].replace('&:', '')} *) {\n    ${modernWithModifiers}\n}`
+						fallbackWithModifiers = `&:is(:where(.group)${variants[groupModifier].replace('&:', '')} *) {\n    ${fallbackWithModifiers}\n}`
+					}
 				}
 			}
 		}

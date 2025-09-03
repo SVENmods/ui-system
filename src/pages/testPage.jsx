@@ -26,7 +26,7 @@ const TestPage = () => {
 		{
 			id: '1',
 			position: { x: 0, y: 0 },
-			content: <BtnDefault>Button</BtnDefault>,
+			content: <BtnDefault className='w-[300px]'>Button</BtnDefault>,
 		},
 		{ id: '2', position: { x: 1, y: 0 } },
 		{ id: '3', position: { x: 2, y: 0 } },
@@ -228,8 +228,8 @@ const TestPage = () => {
 						</div>
 						<div
 							className={classNames('mt-5 rounded-md', {
-								'bg-base-300': !editMode,
-								'bg-blue-500/5': editMode,
+								'bg-base-100': !editMode,
+								'bg-base-300': editMode,
 							})}
 						>
 							<DndContext

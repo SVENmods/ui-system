@@ -128,15 +128,6 @@ const ModalDnd = ({
 
 	return (
 		<>
-			{/* Open the modal using document.getElementById('ID').showModal() method */}
-			{/* <button
-				className='btn'
-				onClick={handleOpenModal}
-				id={`open-modal-${id}`}
-			>
-				open modal
-			</button> */}
-
 			<DndContext onDragEnd={handleDragEnd}>
 				<DroppableDialog id={id}>
 					<DraggableModalBox position={modalPosition} id={id}>
