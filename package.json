@@ -17,6 +17,7 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@radix-ui/react-context-menu": "^2.2.16",
+    "@radix-ui/react-dialog": "^1.1.15",
     "@tailwindcss/vite": "^4.1.7",
     "@uidotdev/usehooks": "^2.4.1",
     "classnames": "^2.5.1",
@@ -30,6 +31,7 @@
     "react-contenteditable": "^3.3.7",
     "react-dom": "^19.1.0",
     "react-element-to-jsx-string": "^17.0.1",
+    "react-resizable": "^3.0.5",
     "react-router-hash-link": "^2.4.3",
     "react-toastify": "^11.0.5"
   },

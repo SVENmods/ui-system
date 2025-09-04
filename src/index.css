@@ -33,3 +33,101 @@ main,
 	flex-direction: column;
 }
 /* @use "./App.scss"; */
+
+.react-resizable {
+	position: relative;
+}
+
+.react-resizable-handle {
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	background-repeat: no-repeat;
+	background-origin: content-box;
+	box-sizing: border-box;
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB2aWV3Qm94PSIwIDAgNiA2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8bGluZSB4MT0iNiIgeTE9IjAiIHgyPSIwIiB5Mj0iNiIgc3Ryb2tlPSIjYWFhIiBzdHJva2Utd2lkdGg9IjEiLz4KPC9zdmc+');
+	background-position: bottom right;
+	padding: 0 3px 3px 0;
+}
+
+.react-resizable-handle-se {
+	bottom: 0;
+	right: 0;
+	cursor: se-resize;
+}
+
+/* Поддержка всех col-span классов */
+.col-span-1 {
+	grid-column: span 1 / span 1;
+}
+.col-span-2 {
+	grid-column: span 2 / span 2;
+}
+.col-span-3 {
+	grid-column: span 3 / span 3;
+}
+.col-span-4 {
+	grid-column: span 4 / span 4;
+}
+.col-span-5 {
+	grid-column: span 5 / span 5;
+}
+.col-span-6 {
+	grid-column: span 6 / span 6;
+}
+.col-span-7 {
+	grid-column: span 7 / span 7;
+}
+.col-span-8 {
+	grid-column: span 8 / span 8;
+}
+.col-span-9 {
+	grid-column: span 9 / span 9;
+}
+.col-span-10 {
+	grid-column: span 10 / span 10;
+}
+.col-span-11 {
+	grid-column: span 11 / span 11;
+}
+.col-span-12 {
+	grid-column: span 12 / span 12;
+}
+
+/* Поддержка row-span классов */
+.row-span-1 {
+	grid-row: span 1 / span 1;
+}
+.row-span-2 {
+	grid-row: span 2 / span 2;
+}
+.row-span-3 {
+	grid-row: span 3 / span 3;
+}
+.row-span-4 {
+	grid-row: span 4 / span 4;
+}
+.row-span-5 {
+	grid-row: span 5 / span 5;
+}
+.row-span-6 {
+	grid-row: span 6 / span 6;
+}
+.row-span-7 {
+	grid-row: span 7 / span 7;
+}
+.row-span-8 {
+	grid-row: span 8 / span 8;
+}
+.row-span-9 {
+	grid-row: span 9 / span 9;
+}
+.row-span-10 {
+	grid-row: span 10 / span 10;
+}
+.row-span-11 {
+	grid-row: span 11 / span 11;
+}
+.row-span-12 {
+	grid-row: span 12 / span 12;
+}

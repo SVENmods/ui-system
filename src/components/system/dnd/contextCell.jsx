@@ -10,6 +10,7 @@ const ContextCell = ({
 	duplicateElement,
 	setFocusModeFlag,
 	setModalPosition,
+	changeSize,
 }) => {
 	const itemClass =
 		'group relative flex items-center data-[highlighted]:bg-base-300 pr-[5px] pl-[25px] rounded-[3px] outline-none h-[25px] text-[13px] text-base-content leading-none cursor-pointer select-none data-[disabled]:text-gray-500 data-[disabled]:cursor-not-allowed gap-2'
@@ -108,6 +109,26 @@ const ContextCell = ({
 								strokeLinecap='round'
 								strokeLinejoin='round'
 								d='M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6'
+							/>
+						</svg>
+					</ContextMenu.Item>
+					<ContextMenu.Item
+						className={classNames(itemClass)}
+						onSelect={changeSize}
+					>
+						<span>Change element size</span>
+						<svg
+							xmlns='http://www.w3.org/2000/svg'
+							fill='none'
+							viewBox='0 0 24 24'
+							strokeWidth={1.5}
+							stroke='currentColor'
+							className='size-4'
+						>
+							<path
+								strokeLinecap='round'
+								strokeLinejoin='round'
+								d='M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15'
 							/>
 						</svg>
 					</ContextMenu.Item>
