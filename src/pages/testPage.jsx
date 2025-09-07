@@ -20,18 +20,20 @@ import ModalDnd from '../components/system/dnd/modalDnd'
 import { DeleteElement } from '../components/system/dnd/deleteElement'
 import { DuplicateElement } from '../components/system/dnd/duplicateElement'
 import { useHandleDragEnd } from '../components/system/dnd/hooks/useHandleDragEnd'
+import { ResizableBox } from 'react-resizable'
 
 const TestPage = () => {
 	const [items, setItems] = useState([
 		{
 			id: '1',
 			position: { x: 0, y: 0 },
-			content: <BtnDefault className='w-[300px]'>Button</BtnDefault>,
+			content: <BtnDefault>Button</BtnDefault>,
+			size: { width: 1, height: 1 },
 		},
-		{ id: '2', position: { x: 1, y: 0 } },
-		{ id: '3', position: { x: 2, y: 0 } },
-		{ id: '4', position: { x: 0, y: 1 } },
-		{ id: '5', position: { x: 1, y: 1 } },
+		{ id: '2', position: { x: 1, y: 0 }, size: { width: 1, height: 1 } },
+		{ id: '3', position: { x: 2, y: 0 }, size: { width: 1, height: 1 } },
+		{ id: '4', position: { x: 0, y: 1 }, size: { width: 1, height: 1 } },
+		{ id: '5', position: { x: 1, y: 1 }, size: { width: 1, height: 1 } },
 	])
 	const [activeId, setActiveId] = useState(null)
 	const [dragOverY, setDragOverY] = useState(null)
@@ -274,6 +276,15 @@ const TestPage = () => {
 							</DndContext>
 						</div>
 						<div className='mt-5'></div>
+						<ResizableBox
+							width={200}
+							height={200}
+							minConstraints={[60, 60]}
+							draggableOpts={{ grid: [60, 60] }}
+							className='border'
+						>
+							<span>Contents</span>
+						</ResizableBox>
 					</div>
 				</div>
 			</main>

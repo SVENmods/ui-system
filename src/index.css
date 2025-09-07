@@ -33,3 +33,25 @@ main,
 	flex-direction: column;
 }
 /* @use "./App.scss"; */
+
+.react-resizable {
+	position: relative;
+}
+
+.react-resizable-handle {
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	background-repeat: no-repeat;
+	background-origin: content-box;
+	box-sizing: border-box;
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB2aWV3Qm94PSIwIDAgNiA2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8bGluZSB4MT0iNiIgeTE9IjAiIHgyPSIwIiB5Mj0iNiIgc3Ryb2tlPSIjYWFhIiBzdHJva2Utd2lkdGg9IjEiLz4KPC9zdmc+');
+	background-position: bottom right;
+	padding: 0 3px 3px 0;
+}
+
+.react-resizable-handle-se {
+	bottom: 0;
+	right: 0;
+	cursor: se-resize;
+}
