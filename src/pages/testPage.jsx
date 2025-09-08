@@ -246,12 +246,10 @@ const TestPage = () => {
 								onDragEnd={handleDragEnd}
 							>
 								<div
-									className='gap-2 grid w-full'
-									style={{
-										gridTemplateColumns:
-											'repeat(12, 1fr)',
-										gridTemplateRows: `repeat(${gridRows - 1}, minmax(60px, auto)) minmax(0px, auto)`,
-									}}
+									className={classNames(
+										'gap-2 grid grid-cols-12 w-full',
+										`grid-row-${gridRows - 1}`
+									)}
 								>
 									{gridCells}
 								</div>
