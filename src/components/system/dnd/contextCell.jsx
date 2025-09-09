@@ -46,7 +46,9 @@ const ContextCell = ({
 								modal.showModal()
 								setFocusModeFlag(true)
 								setModalPosition({
-									x: childrenCoordinates.left,
+									x:
+										childrenCoordinates.left -
+										420 / 2,
 									y:
 										childrenCoordinates.top +
 										cellBoxHeight +

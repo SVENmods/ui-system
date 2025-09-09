@@ -1,200 +1,38 @@
 import SideNav from '../components/system/sidenav'
-import {
-	closestCenter,
-	DndContext,
-	DragOverlay,
-	KeyboardSensor,
-	PointerSensor,
-	useSensor,
-	useSensors,
-} from '@dnd-kit/core'
-import GridItem from '../components/system/dnd/gridItem'
-import GridCell from '../components/system/dnd/gridCell'
-import { useState, useMemo, useCallback } from 'react'
-import { Item } from '../components/system/dnd/item'
+import { useState, useRef } from 'react'
 import ContextCell from '../components/system/dnd/contextCell'
-import BtnDefault from './../components/ui/group/buttons/default/btnDefault'
-import Toggle from './../components/ui/group/toggle/default/toggle'
+import BtnDefault from '../components/ui/group/buttons/default/btnDefault'
+import Toggle from '../components/ui/group/toggle/default/toggle'
 import classNames from 'classnames'
 import ModalDnd from '../components/system/dnd/modalDnd'
 import { DeleteElement } from '../components/system/dnd/deleteElement'
 import { DuplicateElement } from '../components/system/dnd/duplicateElement'
-import { useHandleDragEnd } from '../components/system/dnd/hooks/useHandleDragEnd'
-import { ResizableBox } from 'react-resizable'
+import { Responsive, WidthProvider } from 'react-grid-layout'
+
+const ResponsiveGridLayout = WidthProvider(Responsive)
 
 const TestPage = () => {
 	const [items, setItems] = useState([
 		{
-			id: '1',
-			position: { x: 0, y: 0 },
+			i: '1',
+			x: 0,
+			y: 0,
+			w: 1,
+			h: 2,
 			content: <BtnDefault>Button</BtnDefault>,
-			size: { width: 1, height: 1 },
 		},
-		{ id: '2', position: { x: 1, y: 0 }, size: { width: 1, height: 1 } },
-		{ id: '3', position: { x: 2, y: 0 }, size: { width: 1, height: 1 } },
-		{ id: '4', position: { x: 0, y: 1 }, size: { width: 1, height: 1 } },
-		{ id: '5', position: { x: 1, y: 1 }, size: { width: 1, height: 1 } },
+		{ i: 'b', x: 1, y: 0, w: 3, h: 2 },
+		{ i: 'c', x: 4, y: 0, w: 1, h: 2 },
+		{ i: 'd', x: 4, y: 0, w: 1, h: 2 },
+		{ i: 'e', x: 4, y: 0, w: 1, h: 2 },
 	])
-	const [activeId, setActiveId] = useState(null)
-	const [dragOverY, setDragOverY] = useState(null)
 	const [editMode, setEditMode] = useState(false)
 	const [viewMode, setViewMode] = useState(false)
-
-	// Мемоизируем вычисления для оптимизации
-	const maxY = useMemo(
-		() => Math.max(...items.map((item) => item.position.y), 0),
-		[items]
-	)
-	const gridRows = useMemo(
-		() => Math.max(maxY + 2, dragOverY ? dragOverY + 2 : maxY + 2),
-		[maxY, dragOverY]
-	)
-
-	const sensors = useSensors(
-		useSensor(PointerSensor),
-		useSensor(KeyboardSensor, {
-			coordinateGetter: (event, args) => {
-				switch (event.code) {
-					case 'Space':
-					case 'Enter':
-						return args.active.rect.current.translated
-					case 'ArrowLeft':
-						return {
-							x: args.active.rect.current.translated.x - 1,
-							y: args.active.rect.current.translated.y,
-						}
-					case 'ArrowRight':
-						return {
-							x: args.active.rect.current.translated.x + 1,
-							y: args.active.rect.current.translated.y,
-						}
-					case 'ArrowDown':
-						return {
-							x: args.active.rect.current.translated.x,
-							y: args.active.rect.current.translated.y + 1,
-						}
-					case 'ArrowUp':
-						return {
-							x: args.active.rect.current.translated.x,
-							y: args.active.rect.current.translated.y - 1,
-						}
-					default:
-						return args.active.rect.current.translated
-				}
-			},
-		})
-	)
+	const classRef = useRef(null)
 
 	const [focusedCellId, setFocusedCellId] = useState(null)
 
 	const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 })
-
-	// Мемоизируем рендеринг ячеек сетки
-	const gridCells = useMemo(() => {
-		return Array.from({ length: 12 * gridRows }, (_, index) => {
-			const x = index % 12
-			const y = Math.floor(index / 12)
-			const item = items.find(
-				(item) => item.position.x === x && item.position.y === y
-			)
-			const isLastRow = y === gridRows - 1
-
-			return (
-				<GridCell
-					key={index}
-					id={index}
-					isLastRow={isLastRow}
-					editMode={editMode}
-					viewMode={viewMode}
-					focusModeFlag={focusedCellId === index}
-				>
-					{item && (
-						<>
-							<ContextCell
-								editMode={editMode}
-								viewMode={viewMode}
-								id={index}
-								deleteElement={() => {
-									DeleteElement(setItems, item)
-								}}
-								duplicateElement={() => {
-									DuplicateElement(setItems, item)
-								}}
-								setFocusModeFlag={(isFocused) => {
-									setFocusedCellId(
-										isFocused ? index : null
-									)
-								}}
-								modalPosition={modalPosition}
-								setModalPosition={setModalPosition}
-							>
-								<GridItem
-									id={item.id}
-									editMode={editMode}
-									viewMode={viewMode}
-									focusModeFlag={
-										focusedCellId === index
-									}
-								>
-									{item.content
-										? item.content
-										: item.id}
-								</GridItem>
-							</ContextCell>
-							<ModalDnd
-								id={index}
-								setFocusModeFlag={(isFocused) => {
-									setFocusedCellId(
-										isFocused ? index : null
-									)
-								}}
-								modalPosition={modalPosition}
-								setModalPosition={setModalPosition}
-								itemId={item.id}
-							/>
-						</>
-					)}
-				</GridCell>
-			)
-		})
-	}, [items, gridRows, editMode, viewMode, focusedCellId, modalPosition])
-
-	const handleDragStart = useCallback(
-		(event) => {
-			if (!editMode) return
-			const { active } = event
-			// console.log('Drag started:', active.id)
-			setActiveId(active.id)
-			setDragOverY(null)
-		},
-		[editMode]
-	)
-
-	const handleDragOver = useCallback(
-		(event) => {
-			if (!editMode) return
-			const { over } = event
-
-			if (over?.id && over.id.startsWith('cell-')) {
-				const cellIndex = parseInt(over.id.replace('cell-', ''))
-				const y = Math.floor(cellIndex / 12)
-
-				// Если перетаскиваем за пределы текущей сетки, расширяем её
-				if (y > maxY) {
-					setDragOverY(y)
-				}
-			}
-		},
-		[maxY, editMode]
-	)
-
-	const handleDragEnd = useHandleDragEnd(
-		setItems,
-		setActiveId,
-		setDragOverY,
-		gridRows,
-		editMode
-	)
 
 	return (
 		<>
@@ -228,61 +66,109 @@ const TestPage = () => {
 								/>
 							</div>
 						</div>
-						<div
-							className={classNames('mt-5 rounded-md', {
-								'bg-base-100': !editMode,
-								'bg-base-300': editMode,
-							})}
-						>
-							<DndContext
-								sensors={editMode ? sensors : undefined}
-								collisionDetection={
-									editMode
-										? closestCenter
-										: undefined
+
+						<ResponsiveGridLayout
+							className={classNames(
+								'mt-5 layout rounded-md overflow-hidden',
+								{
+									'bg-base-100': !editMode,
+									'bg-base-300': editMode,
 								}
-								onDragStart={handleDragStart}
-								onDragOver={handleDragOver}
-								onDragEnd={handleDragEnd}
-							>
-								<div
-									className={classNames(
-										'gap-2 grid grid-cols-12 w-full',
-										`grid-row-${gridRows - 1}`
-									)}
-								>
-									{gridCells}
-								</div>
-								<DragOverlay>
-									{activeId ? (
-										<Item id={activeId}>
-											{(() => {
-												const activeItem =
-													items.find(
-														(item) =>
-															item.id ===
-															activeId
-													)
-												return (
-													activeItem?.content ||
-													activeId
-												)
-											})()}
-										</Item>
-									) : null}
-								</DragOverlay>
-							</DndContext>
-						</div>
-						<div className='mt-5'></div>
-						<ResizableBox
-							width={200}
-							height={200}
-							minConstraints={[60, 60]}
-							draggableOpts={{ grid: [60, 60] }}
-							className='border'
+							)}
+							layouts={{ xl: items }}
+							breakpoints={{
+								'2xl': 1536,
+								xl: 1280,
+								lg: 1024,
+								md: 768,
+								sm: 640,
+								xs: 480,
+								xxs: 0,
+							}}
+							cols={{
+								xl: 12,
+								lg: 10,
+								md: 8,
+								sm: 6,
+								xs: 4,
+								xxs: 2,
+							}}
+							rowHeight={25}
+							verticalCompact={false}
 						>
-							<span>Contents</span>
-						</ResizableBox>
+							{items.map((item) => (
+								<div
+									key={item.i}
+									className={classNames(
+										'rounded-lg',
+										{
+											'bg-slate-300 dark:bg-slate-800 border border-solid':
+												focusedCellId ===
+												item.i,
+											'border border-dashed':
+												viewMode,
+											'bg-base-100 cursor-grab':
+												editMode,
+										}
+									)}
+									id={`cell-${item.i}`}
+									ref={classRef}
+								>
+									<ContextCell
+										editMode={editMode}
+										viewMode={viewMode}
+										id={item.i}
+										deleteElement={() => {
+											DeleteElement(
+												setItems,
+												item
+											)
+										}}
+										duplicateElement={() => {
+											DuplicateElement(
+												setItems,
+												item
+											)
+										}}
+										setFocusModeFlag={(
+											isFocused
+										) => {
+											setFocusedCellId(
+												isFocused
+													? item.i
+													: null
+											)
+										}}
+										modalPosition={modalPosition}
+										setModalPosition={
+											setModalPosition
+										}
+									>
+										<div className='w-full h-full'>
+											<span>
+												{item.content
+													? item.content
+													: item.i}
+											</span>
+										</div>
+									</ContextCell>
+								</div>
+							))}
+						</ResponsiveGridLayout>
+						{items.map((item) => (
+							<ModalDnd
+								key={item.i}
+								id={item.i}
+								setFocusModeFlag={(isFocused) => {
+									setFocusedCellId(
+										isFocused ? item.i : null
+									)
+								}}
+								modalPosition={modalPosition}
+								setModalPosition={setModalPosition}
+								itemId={item.i}
+							/>
+						))}
 					</div>
 				</div>
 			</main>
