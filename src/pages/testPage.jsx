@@ -10,6 +10,7 @@ import { DuplicateElement } from '../components/system/dnd/duplicateElement'
 import { Responsive, WidthProvider } from 'react-grid-layout'
 import TestComp from './test'
 import Selecto from 'react-selecto'
+import TestMove from './testMove'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -164,6 +165,7 @@ const TestPage = () => {
 								xxs: 0,
 							}}
 							cols={{
+								'2xl': 12,
 								xl: 12,
 								lg: 10,
 								md: 8,
@@ -285,6 +287,8 @@ const TestPage = () => {
 						))}
 						<div className='mt-10'></div>
 						<TestComp />
+						<div className='mt-10'></div>
+						<TestMove />
 					</div>
 				</div>
 			</main>
