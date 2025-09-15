@@ -1,5 +1,7 @@
-export const DeleteElement = (setItems, item) => {
+const DeleteElement = (setItems, item) => {
 	setItems((prevItems) =>
-		prevItems.filter((element) => element.id !== item.id)
+		prevItems.filter((element) => element.i !== item.i)
 	)
 }
+
+export default DeleteElement

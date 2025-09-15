@@ -1,35 +1,39 @@
 import SideNav from '../components/system/sidenav'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, React } from 'react'
 import ContextCell from '../components/system/dnd/contextCell'
 import BtnDefault from '../components/ui/group/buttons/default/btnDefault'
 import Toggle from '../components/ui/group/toggle/default/toggle'
 import classNames from 'classnames'
 import ModalDnd from '../components/system/dnd/modalDnd'
-import { DeleteElement } from '../components/system/dnd/deleteElement'
+import DeleteElement from '../components/system/dnd/deleteElement'
 import { DuplicateElement } from '../components/system/dnd/duplicateElement'
 import { Responsive, WidthProvider } from 'react-grid-layout'
 import TestComp from './test'
-import Selecto from 'react-selecto'
 import TestMove from './testMove'
+import AccordionDefault from '../components/ui/group/accordion/default/accordion'
+import HTMLReactParser from 'html-react-parser/lib/index'
+import { SHA256 } from 'crypto-js'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 const TestPage = () => {
+	const [editMode, setEditMode] = useState(true)
+
 	const [items, setItems] = useState([
 		{
 			i: '1',
 			x: 0,
 			y: 0,
 			w: 1,
-			h: 2,
+			h: 1,
 			content: <BtnDefault>Button</BtnDefault>,
+			alignMode: 'left',
 		},
-		{ i: 'b', x: 1, y: 0, w: 3, h: 2 },
-		{ i: 'c', x: 4, y: 0, w: 1, h: 2 },
-		{ i: 'd', x: 4, y: 0, w: 1, h: 2 },
-		{ i: 'e', x: 4, y: 0, w: 1, h: 2 },
+		{ i: 'b', x: 1, y: 0, w: 3, h: 2, alignMode: 'center' },
+		{ i: 'c', x: 4, y: 0, w: 1, h: 2, alignMode: 'center' },
+		{ i: 'd', x: 4, y: 0, w: 1, h: 2, alignMode: 'center' },
+		{ i: 'e', x: 4, y: 0, w: 1, h: 2, alignMode: 'center' },
 	])
-	const [editMode, setEditMode] = useState(false)
 	const [viewMode, setViewMode] = useState(false)
 	const classRef = useRef(null)
 
@@ -39,10 +43,7 @@ const TestPage = () => {
 
 	const [gapToggle, setGapToggle] = useState(true)
 
-	const selectoRef = useRef(null)
-
-	const [selectoMode, setSelectoMode] = useState(true)
-	const [isDragging, setIsDragging] = useState(false)
+	const [draggingElement, setDraggingElement] = useState(null)
 
 	useEffect(() => {
 		// Clear selections when edit mode is turned off
@@ -54,30 +55,22 @@ const TestPage = () => {
 		}
 	}, [editMode])
 
-	useEffect(() => {
-		// Ensure DOM is ready before initializing Selecto
-		if (selectoRef.current && document.getElementById('grid-layout')) {
-			// Selecto will be automatically initialized by the react-selecto component
-		}
-	}, [items, editMode]) // Re-run when items or editMode change
+	const onDrop = (layout, layoutItem, event) => {
+		console.log('Drop event:', event)
+		console.log('Layout item:', layoutItem)
 
-	// Disable Selecto during drag operations
-	useEffect(() => {
-		if (isDragging) {
-			setSelectoMode(false)
-			// Clear any existing selections when dragging starts
-			const selectedElements = document.querySelectorAll(
-				'.react-grid-item.selected'
-			)
-			selectedElements.forEach((el) => el.classList.remove('selected'))
-		} else {
-			// Re-enable Selecto after drag ends with a small delay
-			const timer = setTimeout(() => {
-				setSelectoMode(true)
-			}, 100)
-			return () => clearTimeout(timer)
+		layoutItem = {
+			...layoutItem,
+			w: 1,
+			h: 1,
+			content: HTMLReactParser(draggingElement),
+			i: SHA256(
+				new Date().getTime().toString().slice(0, 5) +
+					Math.random().toString(36).substring(2, 5)
+			).toString(),
 		}
-	}, [isDragging])
+		setItems((prevItems) => [...prevItems, layoutItem])
+	}
 
 	return (
 		<>
@@ -121,34 +114,22 @@ const TestPage = () => {
 								/>
 							</div>
 						</div>
-						{editMode && selectoMode && !isDragging && (
-							<Selecto
-								ref={selectoRef}
-								dragContainer={'.layout'}
-								selectableTargets={['.react-grid-item']}
-								hitRate={50}
-								selectFromInside={true}
-								ratio={0}
-								selectByClick={true}
-								onSelect={(e) => {
-									// Prevent selection during drag operations
-									if (isDragging) {
-										return
-									}
-									e.added.forEach((el) => {
-										el.classList.add('selected')
-									})
-									e.removed.forEach((el) => {
-										el.classList.remove(
-											'selected'
-										)
-									})
-								}}
-							/>
-						)}
+
+						<div
+							className=''
+							draggable={true}
+							unselectable='on'
+							onDragStart={(e) => {
+								console.log(e)
+
+								setDraggingElement(e.target.innerHTML)
+							}}
+						>
+							<BtnDefault>Button</BtnDefault>
+						</div>
 						<ResponsiveGridLayout
 							className={classNames(
-								'mt-5 layout rounded-md overflow-hidden',
+								'mt-5 layout rounded-md',
 								{
 									'bg-base-100': !editMode,
 									'bg-base-300': editMode,
@@ -173,49 +154,22 @@ const TestPage = () => {
 								xs: 4,
 								xxs: 2,
 							}}
-							rowHeight={25}
+							rowHeight={60}
 							verticalCompact={false}
 							margin={gapToggle ? [10, 10] : [0, 0]}
 							autoSize={true}
 							id='grid-layout'
-							onDragStart={() => {
-								setIsDragging(true)
-								setSelectoMode(false)
-							}}
-							onDrag={() => {
-								setIsDragging(true)
-							}}
-							onDragStop={() => {
-								setIsDragging(false)
-							}}
-							onDragEnd={() => {
-								setIsDragging(false)
-							}}
-							onResizeStart={() => {
-								setIsDragging(true)
-								setSelectoMode(false)
-							}}
-							onResize={() => {
-								setIsDragging(true)
-							}}
-							onResizeStop={() => {
-								setIsDragging(false)
-							}}
-							onLayoutChange={() => {
-								// Layout change doesn't necessarily mean dragging is over
-								// Only reset if not currently dragging
-								if (!isDragging) {
-									setTimeout(() => {
-										setSelectoMode(true)
-									}, 100)
-								}
-							}}
+							isDroppable={editMode}
+							onDrop={onDrop}
+							isDraggable={editMode}
+							isResizable={editMode}
+							useCSSTransforms={true}
 						>
 							{items.map((item) => (
 								<div
 									key={item.i}
 									className={classNames(
-										'rounded-lg [&.selected]:bg-red-500 ',
+										'rounded-lg flex items-start',
 										{
 											'bg-slate-300 dark:bg-slate-800 border border-solid':
 												focusedCellId ===
@@ -225,6 +179,15 @@ const TestPage = () => {
 												viewMode,
 											'bg-base-100 cursor-grab':
 												editMode,
+											'justify-start':
+												item.alignMode ===
+												'left',
+											'justify-center':
+												item.alignMode ===
+												'center',
+											'justify-end':
+												item.alignMode ===
+												'right',
 										}
 									)}
 									id={`cell-${item.i}`}
@@ -259,14 +222,25 @@ const TestPage = () => {
 										setModalPosition={
 											setModalPosition
 										}
+										alignMode={item.alignMode}
+										setAlignMode={(alignMode) => {
+											setItems((prevItems) =>
+												prevItems.map(
+													(prevItem) =>
+														prevItem.i ===
+														item.i
+															? {
+																	...prevItem,
+																	alignMode,
+																}
+															: prevItem
+												)
+											)
+										}}
 									>
-										<div className='w-full h-full'>
-											<span>
-												{item.content
-													? item.content
-													: item.i}
-											</span>
-										</div>
+										{item.content
+											? item.content
+											: item.i}
 									</ContextCell>
 								</div>
 							))}

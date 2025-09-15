@@ -10,9 +10,45 @@ const ContextCell = ({
 	duplicateElement,
 	setFocusModeFlag,
 	setModalPosition,
+	setAlignMode,
+	alignMode,
 }) => {
 	const itemClass =
 		'group relative flex items-center data-[highlighted]:bg-base-300 pr-[5px] pl-[25px] rounded-[3px] outline-none h-[25px] text-[13px] text-base-content leading-none cursor-pointer select-none data-[disabled]:text-gray-500 data-[disabled]:cursor-not-allowed gap-2'
+
+	const checkCircle = (
+		<svg
+			xmlns='http://www.w3.org/2000/svg'
+			fill='none'
+			viewBox='0 0 24 24'
+			strokeWidth={1.5}
+			stroke='currentColor'
+			className='size-3'
+		>
+			<path
+				strokeLinecap='round'
+				strokeLinejoin='round'
+				d='M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'
+			/>
+		</svg>
+	)
+
+	const toggleModal = () => {
+		const modal = document.getElementById(`dialog-area-${id}`)
+
+		const cellBox = document.querySelector(`#cell-${id}`)
+
+		const childrenCoordinates = cellBox.getBoundingClientRect()
+		const cellBoxHeight = cellBox.clientHeight
+		if (modal && typeof modal.showModal === 'function') {
+			modal.showModal()
+			setFocusModeFlag(true)
+			setModalPosition({
+				x: childrenCoordinates.left - 420 / 2,
+				y: childrenCoordinates.top + cellBoxHeight + 8,
+			})
+		}
+	}
 
 	return (
 		<ContextMenu.Root>
@@ -28,33 +64,7 @@ const ContextCell = ({
 					<ContextMenu.Item
 						className={classNames(itemClass)}
 						onSelect={() => {
-							const modal = document.getElementById(
-								`dialog-area-${id}`
-							)
-
-							const cellBox = document.querySelector(
-								`#cell-${id}`
-							)
-
-							const childrenCoordinates =
-								cellBox.getBoundingClientRect()
-							const cellBoxHeight = cellBox.clientHeight
-							if (
-								modal &&
-								typeof modal.showModal === 'function'
-							) {
-								modal.showModal()
-								setFocusModeFlag(true)
-								setModalPosition({
-									x:
-										childrenCoordinates.left -
-										420 / 2,
-									y:
-										childrenCoordinates.top +
-										cellBoxHeight +
-										8,
-								})
-							}
+							toggleModal()
 						}}
 					>
 						<span>Tailwind Editor</span>
@@ -133,6 +143,39 @@ const ContextCell = ({
 							/>
 						</svg>
 					</ContextMenu.Item>
+					<ContextMenu.Separator className='bg-base-content m-[5px] h-px' />
+					<ContextMenu.RadioGroup
+						value={alignMode}
+						onValueChange={setAlignMode}
+					>
+						<ContextMenu.RadioItem
+							className={classNames(itemClass)}
+							value='left'
+						>
+							<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
+								{checkCircle}
+							</ContextMenu.ItemIndicator>
+							Left
+						</ContextMenu.RadioItem>
+						<ContextMenu.RadioItem
+							className={classNames(itemClass)}
+							value='center'
+						>
+							<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
+								{checkCircle}
+							</ContextMenu.ItemIndicator>
+							Center
+						</ContextMenu.RadioItem>
+						<ContextMenu.RadioItem
+							className={classNames(itemClass)}
+							value='right'
+						>
+							<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
+								{checkCircle}
+							</ContextMenu.ItemIndicator>
+							Right
+						</ContextMenu.RadioItem>
+					</ContextMenu.RadioGroup>
 				</ContextMenu.Content>
 			</ContextMenu.Portal>
 		</ContextMenu.Root>
