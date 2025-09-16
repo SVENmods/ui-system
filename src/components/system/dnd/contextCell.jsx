@@ -10,6 +10,8 @@ const ContextCell = ({
 	duplicateElement,
 	setFocusModeFlag,
 	setModalPosition,
+	setJustifyMode,
+	justifyMode,
 	setAlignMode,
 	alignMode,
 }) => {
@@ -36,7 +38,7 @@ const ContextCell = ({
 	const toggleModal = () => {
 		const modal = document.getElementById(`dialog-area-${id}`)
 
-		const cellBox = document.querySelector(`#cell-${id}`)
+		const cellBox = document.querySelector(`#child-element-${id}`)
 
 		const childrenCoordinates = cellBox.getBoundingClientRect()
 		const cellBoxHeight = cellBox.clientHeight
@@ -52,7 +54,11 @@ const ContextCell = ({
 
 	return (
 		<ContextMenu.Root>
-			<ContextMenu.Trigger disabled={!editMode} className=''>
+			<ContextMenu.Trigger
+				disabled={!editMode}
+				className='child-element'
+				id={`child-element-${id}`}
+			>
 				{children}
 			</ContextMenu.Trigger>
 			<ContextMenu.Portal>
@@ -144,38 +150,113 @@ const ContextCell = ({
 						</svg>
 					</ContextMenu.Item>
 					<ContextMenu.Separator className='bg-base-content m-[5px] h-px' />
-					<ContextMenu.RadioGroup
-						value={alignMode}
-						onValueChange={setAlignMode}
-					>
-						<ContextMenu.RadioItem
+					<ContextMenu.Sub>
+						<ContextMenu.SubTrigger
 							className={classNames(itemClass)}
-							value='left'
 						>
-							<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
-								{checkCircle}
-							</ContextMenu.ItemIndicator>
-							Left
-						</ContextMenu.RadioItem>
-						<ContextMenu.RadioItem
-							className={classNames(itemClass)}
-							value='center'
-						>
-							<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
-								{checkCircle}
-							</ContextMenu.ItemIndicator>
-							Center
-						</ContextMenu.RadioItem>
-						<ContextMenu.RadioItem
-							className={classNames(itemClass)}
-							value='right'
-						>
-							<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
-								{checkCircle}
-							</ContextMenu.ItemIndicator>
-							Right
-						</ContextMenu.RadioItem>
-					</ContextMenu.RadioGroup>
+							Align/Justify
+							<svg
+								xmlns='http://www.w3.org/2000/svg'
+								fill='none'
+								viewBox='0 0 24 24'
+								strokeWidth={1.5}
+								stroke='currentColor'
+								className='size-4'
+							>
+								<path
+									strokeLinecap='round'
+									strokeLinejoin='round'
+									d='m8.25 4.5 7.5 7.5-7.5 7.5'
+								/>
+							</svg>
+						</ContextMenu.SubTrigger>
+						<ContextMenu.Portal>
+							<ContextMenu.SubContent
+								className='bg-base-100 shadow-lg p-2 border border-base-300 rounded-lg min-w-[220px] overflow-hidden'
+								sideOffset={2}
+								alignOffset={-5}
+							>
+								<ContextMenu.RadioGroup
+									value={justifyMode}
+									onValueChange={setJustifyMode}
+								>
+									<ContextMenu.RadioItem
+										className={classNames(
+											itemClass
+										)}
+										value='left'
+									>
+										<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
+											{checkCircle}
+										</ContextMenu.ItemIndicator>
+										Left
+									</ContextMenu.RadioItem>
+									<ContextMenu.RadioItem
+										className={classNames(
+											itemClass
+										)}
+										value='center'
+									>
+										<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
+											{checkCircle}
+										</ContextMenu.ItemIndicator>
+										Center
+									</ContextMenu.RadioItem>
+									<ContextMenu.RadioItem
+										className={classNames(
+											itemClass
+										)}
+										value='right'
+									>
+										<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
+											{checkCircle}
+										</ContextMenu.ItemIndicator>
+										Right
+									</ContextMenu.RadioItem>
+								</ContextMenu.RadioGroup>
+								<ContextMenu.Separator className='bg-base-content m-[5px] h-px' />
+
+								<ContextMenu.RadioGroup
+									value={alignMode}
+									onValueChange={setAlignMode}
+								>
+									<ContextMenu.RadioItem
+										className={classNames(
+											itemClass
+										)}
+										value='top'
+									>
+										<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
+											{checkCircle}
+										</ContextMenu.ItemIndicator>
+										Top
+									</ContextMenu.RadioItem>
+									<ContextMenu.RadioItem
+										className={classNames(
+											itemClass
+										)}
+										value='center'
+									>
+										<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
+											{checkCircle}
+										</ContextMenu.ItemIndicator>
+										Center
+									</ContextMenu.RadioItem>
+									<ContextMenu.RadioItem
+										className={classNames(
+											itemClass
+										)}
+										value='bottom'
+									>
+										<ContextMenu.ItemIndicator className='inline-flex left-0 absolute justify-center items-center w-[25px]'>
+											{checkCircle}
+										</ContextMenu.ItemIndicator>
+										Bottom
+									</ContextMenu.RadioItem>
+								</ContextMenu.RadioGroup>
+							</ContextMenu.SubContent>
+						</ContextMenu.Portal>
+					</ContextMenu.Sub>
 				</ContextMenu.Content>
 			</ContextMenu.Portal>
 		</ContextMenu.Root>

@@ -1,5 +1,5 @@
 import SideNav from '../components/system/sidenav'
-import { useState, useRef, useEffect, React } from 'react'
+import { useState, useRef, React } from 'react'
 import ContextCell from '../components/system/dnd/contextCell'
 import BtnDefault from '../components/ui/group/buttons/default/btnDefault'
 import Toggle from '../components/ui/group/toggle/default/toggle'
@@ -10,7 +10,6 @@ import { DuplicateElement } from '../components/system/dnd/duplicateElement'
 import { Responsive, WidthProvider } from 'react-grid-layout'
 import TestComp from './test'
 import TestMove from './testMove'
-import AccordionDefault from '../components/ui/group/accordion/default/accordion'
 import HTMLReactParser from 'html-react-parser/lib/index'
 import { SHA256 } from 'crypto-js'
 
@@ -27,12 +26,47 @@ const TestPage = () => {
 			w: 1,
 			h: 1,
 			content: <BtnDefault>Button</BtnDefault>,
-			alignMode: 'left',
+			justifyMode: 'left',
+			alignMode: 'top',
+			defaultCols: 1,
+			defaultRows: 20,
 		},
-		{ i: 'b', x: 1, y: 0, w: 3, h: 2, alignMode: 'center' },
-		{ i: 'c', x: 4, y: 0, w: 1, h: 2, alignMode: 'center' },
-		{ i: 'd', x: 4, y: 0, w: 1, h: 2, alignMode: 'center' },
-		{ i: 'e', x: 4, y: 0, w: 1, h: 2, alignMode: 'center' },
+		{
+			i: 'b',
+			x: 1,
+			y: 0,
+			w: 3,
+			h: 2,
+			justifyMode: 'center',
+			alignMode: 'center',
+		},
+		{
+			i: 'c',
+			x: 4,
+			y: 0,
+			w: 1,
+			h: 2,
+			justifyMode: 'center',
+			alignMode: 'center',
+		},
+		{
+			i: 'd',
+			x: 4,
+			y: 0,
+			w: 1,
+			h: 2,
+			justifyMode: 'center',
+			alignMode: 'center',
+		},
+		{
+			i: 'e',
+			x: 4,
+			y: 0,
+			w: 1,
+			h: 2,
+			justifyMode: 'center',
+			alignMode: 'center',
+		},
 	])
 	const [viewMode, setViewMode] = useState(false)
 	const classRef = useRef(null)
@@ -45,15 +79,7 @@ const TestPage = () => {
 
 	const [draggingElement, setDraggingElement] = useState(null)
 
-	useEffect(() => {
-		// Clear selections when edit mode is turned off
-		if (!editMode) {
-			const selectedElements = document.querySelectorAll(
-				'.react-grid-item.selected'
-			)
-			selectedElements.forEach((el) => el.classList.remove('selected'))
-		}
-	}, [editMode])
+	const rowHeight = 1
 
 	const onDrop = (layout, layoutItem, event) => {
 		console.log('Drop event:', event)
@@ -61,13 +87,15 @@ const TestPage = () => {
 
 		layoutItem = {
 			...layoutItem,
-			w: 1,
-			h: 1,
+			w: 0,
+			h: 0,
 			content: HTMLReactParser(draggingElement),
 			i: SHA256(
 				new Date().getTime().toString().slice(0, 5) +
 					Math.random().toString(36).substring(2, 5)
 			).toString(),
+			justifyMode: 'left',
+			alignMode: 'top',
 		}
 		setItems((prevItems) => [...prevItems, layoutItem])
 	}
@@ -121,7 +149,6 @@ const TestPage = () => {
 							unselectable='on'
 							onDragStart={(e) => {
 								console.log(e)
-
 								setDraggingElement(e.target.innerHTML)
 							}}
 						>
@@ -154,7 +181,7 @@ const TestPage = () => {
 								xs: 4,
 								xxs: 2,
 							}}
-							rowHeight={60}
+							rowHeight={rowHeight}
 							verticalCompact={false}
 							margin={gapToggle ? [10, 10] : [0, 0]}
 							autoSize={true}
@@ -169,7 +196,7 @@ const TestPage = () => {
 								<div
 									key={item.i}
 									className={classNames(
-										'rounded-lg flex items-start',
+										'rounded-lg flex',
 										{
 											'bg-slate-300 dark:bg-slate-800 border border-solid':
 												focusedCellId ===
@@ -180,14 +207,23 @@ const TestPage = () => {
 											'bg-base-100 cursor-grab':
 												editMode,
 											'justify-start':
-												item.alignMode ===
+												item.justifyMode ===
 												'left',
 											'justify-center':
-												item.alignMode ===
+												item.justifyMode ===
 												'center',
 											'justify-end':
-												item.alignMode ===
+												item.justifyMode ===
 												'right',
+											'items-start':
+												item.alignMode ===
+												'top',
+											'items-center':
+												item.alignMode ===
+												'center',
+											'items-end':
+												item.alignMode ===
+												'bottom',
 										}
 									)}
 									id={`cell-${item.i}`}
@@ -222,6 +258,23 @@ const TestPage = () => {
 										setModalPosition={
 											setModalPosition
 										}
+										justifyMode={item.justifyMode}
+										setJustifyMode={(
+											justifyMode
+										) => {
+											setItems((prevItems) =>
+												prevItems.map(
+													(prevItem) =>
+														prevItem.i ===
+														item.i
+															? {
+																	...prevItem,
+																	justifyMode,
+																}
+															: prevItem
+												)
+											)
+										}}
 										alignMode={item.alignMode}
 										setAlignMode={(alignMode) => {
 											setItems((prevItems) =>
