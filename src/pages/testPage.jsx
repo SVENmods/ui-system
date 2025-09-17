@@ -12,6 +12,7 @@ import TestComp from './test'
 import TestMove from './testMove'
 import HTMLReactParser from 'html-react-parser/lib/index'
 import { SHA256 } from 'crypto-js'
+import InputFloatLabel from '../components/ui/group/inputs/floatLabel/inputFloatLabel'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -79,16 +80,42 @@ const TestPage = () => {
 
 	const [draggingElement, setDraggingElement] = useState(null)
 
-	const rowHeight = 1
+	const [rowHeight, setRowHeight] = useState(30)
 
 	const onDrop = (layout, layoutItem, event) => {
 		console.log('Drop event:', event)
 		console.log('Layout item:', layoutItem)
 
+		// Функция для вычисления высоты элемента
+		const calculateElementHeight = (elementHTML) => {
+			if (!elementHTML) return 1
+
+			// Создаем временный элемент для измерения
+			const tempDiv = document.createElement('div')
+			tempDiv.innerHTML = elementHTML
+			tempDiv.style.position = 'absolute'
+			tempDiv.style.visibility = 'hidden'
+			tempDiv.style.top = '-9999px'
+			tempDiv.style.left = '-9999px'
+			tempDiv.style.width = '100px' // Устанавливаем базовую ширину
+
+			document.body.appendChild(tempDiv)
+
+			const height = tempDiv.offsetHeight
+			document.body.removeChild(tempDiv)
+
+			// Конвертируем пиксели в единицы сетки (1 единица = 10px)
+			const gridHeight = Math.max(1, Math.ceil(height / rowHeight))
+
+			return gridHeight
+		}
+
+		const elementHeight = calculateElementHeight(draggingElement)
+
 		layoutItem = {
 			...layoutItem,
-			w: 0,
-			h: 0,
+			w: 1,
+			h: elementHeight,
 			content: HTMLReactParser(draggingElement),
 			i: SHA256(
 				new Date().getTime().toString().slice(0, 5) +
@@ -141,6 +168,30 @@ const TestPage = () => {
 									}
 								/>
 							</div>
+							<div className='flex items-center gap-2'>
+								<span className='font-medium text-sm'>
+									Row Height:
+								</span>
+								<InputFloatLabel
+									name='Row Height'
+									placeholder='Row Height in px min 1'
+									onChange={(e) => {
+										if (
+											Number(e.target.value) <
+											1
+										) {
+											setRowHeight(1)
+										} else {
+											setRowHeight(
+												Number(
+													e.target.value
+												)
+											)
+										}
+									}}
+									type='number'
+								/>
+							</div>
 						</div>
 
 						<div
@@ -164,7 +215,6 @@ const TestPage = () => {
 							)}
 							layouts={{ xl: items }}
 							breakpoints={{
-								'2xl': 1536,
 								xl: 1280,
 								lg: 1024,
 								md: 768,
@@ -173,7 +223,6 @@ const TestPage = () => {
 								xxs: 0,
 							}}
 							cols={{
-								'2xl': 12,
 								xl: 12,
 								lg: 10,
 								md: 8,

@@ -1,12 +1,15 @@
-const InputFloatLabel = () => {
+const InputFloatLabel = ({ name, placeholder, onChange, type }) => {
 	return (
 		<>
 			<label className='floating-label'>
-				<span>Your Email</span>
+				<span>{name ? name : 'Email'}</span>
 				<input
-					type='text'
-					placeholder='mail@site.com'
+					type={type ? type : 'text'}
+					placeholder={
+						placeholder ? placeholder : 'mail@site.com'
+					}
 					className='input input-md'
+					onChange={onChange ? onChange : () => {}}
 				/>
 			</label>
 		</>
