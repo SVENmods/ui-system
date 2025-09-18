@@ -80,11 +80,13 @@ const TestPage = () => {
 
 	const [draggingElement, setDraggingElement] = useState(null)
 
-	const [rowHeight, setRowHeight] = useState(30)
+	const [rowHeight, setRowHeight] = useState(40)
+
+	const [globalLayouts, setGlobalLayouts] = useState(null)
 
 	const onDrop = (layout, layoutItem, event) => {
-		console.log('Drop event:', event)
-		console.log('Layout item:', layoutItem)
+		// console.log('Drop event:', event)
+		// console.log('Layout item:', layoutItem)
 
 		// Функция для вычисления высоты элемента
 		const calculateElementHeight = (elementHTML) => {
@@ -104,13 +106,15 @@ const TestPage = () => {
 			const height = tempDiv.offsetHeight
 			document.body.removeChild(tempDiv)
 
-			// Конвертируем пиксели в единицы сетки (1 единица = 10px)
+			// Конвертируем пиксели в единицы сетки (1 единица = rowHeight)
 			const gridHeight = Math.max(1, Math.ceil(height / rowHeight))
 
 			return gridHeight
 		}
 
 		const elementHeight = calculateElementHeight(draggingElement)
+
+		console.log('draggingElement', draggingElement)
 
 		layoutItem = {
 			...layoutItem,
@@ -125,6 +129,18 @@ const TestPage = () => {
 			alignMode: 'top',
 		}
 		setItems((prevItems) => [...prevItems, layoutItem])
+	}
+
+	const onLayoutChange = (layout, layouts) => {
+		saveToLS(layout)
+		setGlobalLayouts(layouts)
+	}
+
+	const saveToLS = (value) => {
+		// console.log(value)
+		// if (localStorage) {
+		// 	localStorage.setItem('layouts', JSON.stringify(value))
+		// }
 	}
 
 	return (
@@ -181,6 +197,7 @@ const TestPage = () => {
 											1
 										) {
 											setRowHeight(1)
+											e.target.value = 1
 										} else {
 											setRowHeight(
 												Number(
@@ -199,7 +216,7 @@ const TestPage = () => {
 							draggable={true}
 							unselectable='on'
 							onDragStart={(e) => {
-								console.log(e)
+								// console.log(e)
 								setDraggingElement(e.target.innerHTML)
 							}}
 						>
@@ -224,7 +241,7 @@ const TestPage = () => {
 							}}
 							cols={{
 								xl: 12,
-								lg: 10,
+								lg: 12,
 								md: 8,
 								sm: 6,
 								xs: 4,
@@ -240,6 +257,9 @@ const TestPage = () => {
 							isDraggable={editMode}
 							isResizable={editMode}
 							useCSSTransforms={true}
+							onLayoutChange={(layout, layouts) =>
+								onLayoutChange(layout, layouts)
+							}
 						>
 							{items.map((item) => (
 								<div
