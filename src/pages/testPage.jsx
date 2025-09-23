@@ -13,6 +13,7 @@ import TestMove from './testMove'
 import HTMLReactParser from 'html-react-parser/lib/index'
 import { SHA256 } from 'crypto-js'
 import InputFloatLabel from '../components/ui/group/inputs/floatLabel/inputFloatLabel'
+import Grid from '../components/system/gridstack/grid'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -145,7 +146,7 @@ const TestPage = () => {
 
 	return (
 		<>
-			<main>
+			<main className='pb-28'>
 				<div className='flex flex-row flex-wrap lg:flex-nowrap items-start content-start gap-x-6 pt-2 w-full h-full'>
 					<SideNav className={'lg:w-[20%] w-full'} />
 					<div className='w-full lg:w-[80%]'>
@@ -385,6 +386,8 @@ const TestPage = () => {
 						<TestComp />
 						<div className='mt-10'></div>
 						<TestMove />
+						<div className='mt-10'></div>
+						<Grid />
 					</div>
 				</div>
 			</main>
