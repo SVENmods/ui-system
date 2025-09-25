@@ -43,7 +43,7 @@ const Grid = () => {
 					// subGridOpts: subOptions,
 					// subGridDynamic: true,
 					columnOpts: {
-						breakpointForWindow: true, // test window vs grid size
+						breakpointForWindow: true,
 						breakpoints: [
 							{ w: 768, c: 2 },
 							{ w: 992, c: 6 },
@@ -76,8 +76,9 @@ const Grid = () => {
 				</button>
 				<div
 					className={classNames(
-						'grid-stack controlled border rounded-lg [&>.grid-stack-placeholder]:bg-red-500/80'
+						'grid-stack controlled border rounded-lg '
 					)}
+					// [&>.grid-stack-placeholder]:bg-red-500/80
 				>
 					{items.map((item) => {
 						return (

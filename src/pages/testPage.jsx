@@ -14,6 +14,7 @@ import HTMLReactParser from 'html-react-parser/lib/index'
 import { SHA256 } from 'crypto-js'
 import InputFloatLabel from '../components/ui/group/inputs/floatLabel/inputFloatLabel'
 import Grid from '../components/system/gridstack/grid'
+import GridStackComponent from '../components/system/gridstack/gridStackComponent'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -70,6 +71,13 @@ const TestPage = () => {
 			alignMode: 'center',
 		},
 	])
+
+	const [itemsGridStack, setItemsGridStack] = useState([
+		{ id: 'item-1', content: <BtnDefault>Button</BtnDefault> },
+		{ id: 'item-2' },
+		{ id: 'item-3' },
+	])
+
 	const [viewMode, setViewMode] = useState(false)
 	const classRef = useRef(null)
 
@@ -387,7 +395,13 @@ const TestPage = () => {
 						<div className='mt-10'></div>
 						<TestMove />
 						<div className='mt-10'></div>
-						<Grid />
+						{/* <Grid /> */}
+						<div className='mt-10'></div>
+						<GridStackComponent
+							items={itemsGridStack}
+							className='border rounded-lg'
+						/>
+						<div className='mt-10'></div>
 					</div>
 				</div>
 			</main>
