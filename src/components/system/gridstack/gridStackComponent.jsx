@@ -1,11 +1,13 @@
 import 'gridstack/dist/gridstack.min.css'
 import { GridStack } from 'gridstack'
-import { useEffect, useRef, createRef } from 'react'
+import { useEffect, useRef, createRef, useMemo } from 'react'
 import classNames from 'classnames'
 import Cell from './cell'
 import BtnDefault from '../../ui/group/buttons/default/btnDefault'
+import ReactDOMServer from 'react-dom/server'
+import HTMLReactParser from 'html-react-parser'
 
-const GridStackComponent = ({ items, className }) => {
+const GridStackComponent = ({ items, className, setItems }) => {
 	const refs = useRef({})
 	const gridRef = useRef()
 
@@ -14,6 +16,32 @@ const GridStackComponent = ({ items, className }) => {
 			refs.current[id] = refs.current[id] || createRef()
 		})
 	}
+
+	const insert = useMemo(
+		() => [
+			{
+				w: 1,
+				h: 1,
+				name: 'button',
+				component: <BtnDefault>Button</BtnDefault>,
+			},
+			{
+				w: 1,
+				h: 1,
+				name: 'new item 2',
+				content: 'content item 2',
+				component: 'content item 2',
+			},
+			{
+				w: 1,
+				h: 1,
+				name: 'new item 3',
+				content: 'content item 3',
+				component: 'content item 3',
+			},
+		],
+		[]
+	)
 	useEffect(() => {
 		gridRef.current =
 			gridRef.current ||
@@ -37,9 +65,6 @@ const GridStackComponent = ({ items, className }) => {
 							{ w: 1400, c: 10 },
 						],
 					},
-					onChange: (event, eventData) => {
-						console.log('event', event, eventData)
-					},
 				},
 				'.controlled'
 			)
@@ -48,21 +73,61 @@ const GridStackComponent = ({ items, className }) => {
 		grid.removeAll(false)
 		items.forEach(({ id }) => grid.makeWidget(refs.current[id].current))
 		grid.batchUpdate(false)
-		let insert = [{ w: 1, h: 1 }]
+
 		GridStack.setupDragIn(
 			'.sidepanel>.grid-stack-item',
-			undefined,
+			{
+				stop: (e) => {
+					console.log('e', e)
+					console.log('grid change', grid.save(true, true))
+				},
+				start: (e) => {
+					console.log('e', e)
+					console.log(
+						'e.target.gridstackNode.component',
+						ReactDOMServer.renderToStaticMarkup(
+							e.target.gridstackNode.component
+						)
+					)
+					// const toRender = ReactDOMServer.renderToStaticMarkup(
+					// 	e.target.gridstackNode.component
+					// )
+					// e.target.gridstackNode.component = toRender
+					// e.target.innerHTML = toRender
+				},
+			},
 			insert
 		)
-		grid.on('change', (event, eventData) => {
+		grid.on('change', () => {
 			console.log('grid change', grid.save(true, true))
 		})
-	}, [items])
+		grid.on('dropped', () => {
+			console.log('grid dropped')
+		})
+		console.log(
+			'test',
+			ReactDOMServer.renderToStaticMarkup(
+				<BtnDefault>Button</BtnDefault>
+			).toString()
+		)
+	}, [items]) // eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
 		<>
-			<div className='group: flex items-start [&>.grid-stack-item-content>*]:pointer-events-none sidepanel'>
-				<div className='grid-stack-item'>
+			<div className='group flex items-start [&>.grid-stack-item-content>*]:pointer-events-none sidepanel'>
+				{insert.map((element, index) => {
+					return (
+						<div className='grid-stack-item' key={index}>
+							<div
+								className='grid-stack-item-content p-2 border rounded-lg'
+								content={element.content}
+							>
+								{element.component}
+							</div>
+						</div>
+					)
+				})}
+				{/* <div className='grid-stack-item'>
 					<div
 						className='grid-stack-item-content bg-red-500 p-2 border rounded-lg'
 						content={<BtnDefault>Button</BtnDefault>}
@@ -79,7 +144,7 @@ const GridStackComponent = ({ items, className }) => {
 					<div className='grid-stack-item-content bg-gray-500 p-2 border rounded-lg'>
 						new item 3
 					</div>
-				</div>
+				</div> */}
 			</div>
 			<div
 				className={classNames('grid-stack controlled ', className)}

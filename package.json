@@ -29,6 +29,8 @@
     "js-beautify": "^1.15.4",
     "react": "^19.1.0",
     "react-contenteditable": "^3.3.7",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
     "react-element-to-jsx-string": "^17.0.1",
     "react-grid-layout": "^1.5.2",

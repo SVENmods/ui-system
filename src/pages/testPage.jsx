@@ -399,6 +399,7 @@ const TestPage = () => {
 						<div className='mt-10'></div>
 						<GridStackComponent
 							items={itemsGridStack}
+							setItems={setItemsGridStack}
 							className='border rounded-lg'
 						/>
 						<div className='mt-10'></div>
