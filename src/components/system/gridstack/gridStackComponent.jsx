@@ -83,12 +83,12 @@ const GridStackComponent = ({ items, className, setItems }) => {
 				},
 				start: (e) => {
 					console.log('e', e)
-					console.log(
-						'e.target.gridstackNode.component',
-						ReactDOMServer.renderToStaticMarkup(
-							e.target.gridstackNode.component
-						)
-					)
+					// console.log(
+					// 	'e.target.gridstackNode.component',
+					// 	ReactDOMServer.renderToStaticMarkup(
+					// 		e.target.gridstackNode.component
+					// 	)
+					// )
 					// const toRender = ReactDOMServer.renderToStaticMarkup(
 					// 	e.target.gridstackNode.component
 					// )
@@ -114,15 +114,17 @@ const GridStackComponent = ({ items, className, setItems }) => {
 
 	return (
 		<>
-			<div className='group flex items-start [&>.grid-stack-item-content>*]:pointer-events-none sidepanel'>
+			<div className='group flex items-start sidepanel'>
 				{insert.map((element, index) => {
 					return (
 						<div className='grid-stack-item' key={index}>
-							<div
-								className='grid-stack-item-content p-2 border rounded-lg'
-								content={element.content}
-							>
-								{element.component}
+							<div className='grid-stack-item-content p-2 border rounded-lg'>
+								<div className='hidden group-[.sidepanel]:block'>
+									{element.name}
+								</div>
+								<div className='group-[.sidepanel]:hidden component'>
+									{element.component}
+								</div>
 							</div>
 						</div>
 					)
