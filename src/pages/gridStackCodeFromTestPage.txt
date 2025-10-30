@@ -1,0 +1,292 @@
+const refs = useRef({})
+	const gridRef = useRef()
+
+	if (Object.keys(refs.current).length !== items.length) {
+		itemsGridStack.forEach(({ id }) => {
+			refs.current[id] = refs.current[id] || createRef()
+		})
+	}
+
+	const insert = useMemo(
+		() => [
+			{
+				w: 1,
+				h: 1,
+				name: 'button',
+				component: <BtnDefault>Button</BtnDefault>,
+			},
+			{
+				w: 1,
+				h: 1,
+				name: 'new item 2',
+				content: 'content item 2',
+				component: 'component item 2',
+			},
+			{
+				w: 1,
+				h: 1,
+				name: 'new item 3',
+				content: 'content item 3',
+				component: 'component item 3',
+			},
+		],
+		[]
+	)
+
+	useEffect(() => {
+		gridRef.current =
+			gridRef.current ||
+			GridStack.init(
+				{
+					float: true,
+					margin: 4,
+					//! can contain one word
+					// placeholderClass: '',
+					cellHeight: 'auto',
+					// sizeToContent: true,
+					acceptWidgets: true,
+					// subGridOpts: subOptions,
+					// subGridDynamic: true,
+					columnOpts: {
+						breakpointForWindow: true,
+						breakpoints: [
+							{ w: 768, c: 2 },
+							{ w: 992, c: 6 },
+							{ w: 1200, c: 8 },
+							{ w: 1400, c: 10 },
+						],
+					},
+					minRow: 1,
+				},
+				'.controlled'
+			)
+
+		const grid = gridRef.current
+		grid.batchUpdate()
+		grid.removeAll(false)
+		itemsGridStack.forEach(({ id }) =>
+			grid.makeWidget(refs.current[id].current)
+		)
+		grid.batchUpdate(false)
+
+		GridStack.setupDragIn(
+			'.side-panel>.grid-stack-item',
+			{
+				stop: (e) => {
+					console.log('e', e)
+					console.log(
+						'grid change dropping',
+						grid.save(true, true)
+					)
+				},
+				start: (e) => {
+					console.log('e', e)
+					// console.log(
+					// 	'e.target.gridstackNode.component',
+					// 	ReactDOMServer.renderToStaticMarkup(
+					// 		e.target.gridstackNode.component
+					// 	)
+					// )
+					// const toRender = ReactDOMServer.renderToStaticMarkup(
+					// 	e.target.gridstackNode.component
+					// )
+					// e.target.gridstackNode.component = toRender
+					// e.target.innerHTML = toRender
+				},
+			},
+			insert
+		)
+		grid.on('change', () => {
+			console.log('grid change', grid.save())
+			// console.log('grid change', grid.save(true, true))
+			// setItemSaved(grid.save())
+		})
+		grid.on('dropped', () => {
+			console.log('grid dropped')
+			// setItemSaved(grid.save())
+		})
+
+		// grid.enableMove(false)
+		// grid.enableResize(false)
+		// grid.disable()
+	}, [items]) // eslint-disable-line react-hooks/exhaustive-deps
+
+	const loadLayout = () => {
+		// const grid = gridRef.current
+		// grid.batchUpdate()
+		// grid.removeAll(false)
+		// itemsGridStack.forEach(({ id }) =>
+		// 	grid.makeWidget(refs.current[id].current)
+		// )
+		// grid.batchUpdate(false)
+		console.log(gridRef)
+		// const grid = gridRef.current
+		// if (itemSaved) {
+		// 	grid.load(itemSaved, (items, grid, add) => {
+		// 		if (add) {
+		// 			// Custom logic for adding new widgets
+		// 			// gridRef.current.batchUpdate()
+		// 			console.log('grid', grid)
+
+		// 			grid.grid.removeAll(false)
+		// 			itemSaved.forEach((item) => {
+		// 				grid.grid.makeWidget(
+		// 					refs.current[item.id].current
+		// 				) // const el = document.createElement('div')
+		// 				// 	// el.innerHTML = item.content || ''
+		// 				// 	// gridRef.addWidget(el, item)
+		// 				// 	// .console.log('item', item)
+		// 			})
+		// 			// gridRef.current.batchUpdate(false)
+		// 		} else {
+		// 			// Custom logic for removing widgets
+		// 			// items.forEach((item) => grid.removeWidget(item.el))
+		// 		}
+		// 	})
+		// 	// gridRef.current.load(itemSaved)
+		// }
+		gridRef.current.load(itemSaved)
+	}
+
+	const saveLayout = () => {
+		setItemSaved(gridRef.current.save())
+		console.log('saveLayout', gridRef.current.save())
+	}
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+    {/* <div className='group flex items-start side-panel'>
+								{insert.map((element, index) => {
+									return (
+										<div
+											className='grid-stack-item'
+											key={index}
+										>
+											<div className='grid-stack-item-content p-2 border rounded-lg'>
+												<div className='hidden group-[.side-panel]:block'>
+													{element.name}
+												</div>
+												<div className='group-[.side-panel]:hidden component'>
+													{
+														element.component
+													}
+												</div>
+											</div>
+										</div>
+									)
+								})}
+							</div> */}
+							{/* <div
+								className={classNames(
+									'grid-stack controlled border rounded-lg'
+									// className
+								)}
+								// [&>.grid-stack-placeholder]:bg-red-500/80
+							>
+								{itemsGridStack.map((item) => {
+									return (
+										<Cell
+											key={item.id}
+											refs={refs}
+											item={item}
+										>
+											<ContextCell
+												editMode={editMode}
+												viewMode={viewMode}
+												id={item.i}
+												deleteElement={() => {
+													DeleteElement(
+														setItems,
+														item
+													)
+												}}
+												duplicateElement={() => {
+													DuplicateElement(
+														setItems,
+														item
+													)
+												}}
+												setFocusModeFlag={(
+													isFocused
+												) => {
+													setFocusedCellId(
+														isFocused
+															? item.i
+															: null
+													)
+												}}
+												modalPosition={
+													modalPosition
+												}
+												setModalPosition={
+													setModalPosition
+												}
+												justifyMode={
+													item.justifyMode
+												}
+												setJustifyMode={(
+													justifyMode
+												) => {
+													setItems(
+														(
+															prevItems
+														) =>
+															prevItems.map(
+																(
+																	prevItem
+																) =>
+																	prevItem.i ===
+																	item.i
+																		? {
+																				...prevItem,
+																				justifyMode,
+																			}
+																		: prevItem
+															)
+													)
+												}}
+												alignMode={
+													item.alignMode
+												}
+												setAlignMode={(
+													alignMode
+												) => {
+													setItems(
+														(
+															prevItems
+														) =>
+															prevItems.map(
+																(
+																	prevItem
+																) =>
+																	prevItem.i ===
+																	item.i
+																		? {
+																				...prevItem,
+																				alignMode,
+																			}
+																		: prevItem
+															)
+													)
+												}}
+											>
+												{item.content
+													? item.content
+													: item.id}
+											</ContextCell>
+										</Cell>
+									)
+								})}
+							</div> */}

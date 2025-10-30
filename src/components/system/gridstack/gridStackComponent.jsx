@@ -75,11 +75,14 @@ const GridStackComponent = ({ items, className, setItems }) => {
 		grid.batchUpdate(false)
 
 		GridStack.setupDragIn(
-			'.sidepanel>.grid-stack-item',
+			'.sideman>.grid-stack-item',
 			{
 				stop: (e) => {
 					console.log('e', e)
-					console.log('grid change', grid.save(true, true))
+					console.log(
+						'grid change dropping',
+						grid.save(true, true)
+					)
 				},
 				start: (e) => {
 					console.log('e', e)
@@ -112,17 +115,18 @@ const GridStackComponent = ({ items, className, setItems }) => {
 		)
 	}, [items]) // eslint-disable-line react-hooks/exhaustive-deps
 
+	const saveLayout = (layout) => {}
 	return (
 		<>
-			<div className='group flex items-start sidepanel'>
+			<div className='group flex items-start side-panel'>
 				{insert.map((element, index) => {
 					return (
 						<div className='grid-stack-item' key={index}>
 							<div className='grid-stack-item-content p-2 border rounded-lg'>
-								<div className='hidden group-[.sidepanel]:block'>
+								<div className='hidden group-[.side-panel]:block'>
 									{element.name}
 								</div>
-								<div className='group-[.sidepanel]:hidden component'>
+								<div className='group-[.side-panel]:hidden component'>
 									{element.component}
 								</div>
 							</div>

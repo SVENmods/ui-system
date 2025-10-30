@@ -1,5 +1,5 @@
 import SideNav from '../components/system/sidenav'
-import { useState, useRef, React } from 'react'
+import { useState, useRef, React, useEffect, useMemo } from 'react'
 import ContextCell from '../components/system/dnd/contextCell'
 import BtnDefault from '../components/ui/group/buttons/default/btnDefault'
 import Toggle from '../components/ui/group/toggle/default/toggle'
@@ -15,11 +15,20 @@ import { SHA256 } from 'crypto-js'
 import InputFloatLabel from '../components/ui/group/inputs/floatLabel/inputFloatLabel'
 import Grid from '../components/system/gridstack/grid'
 import GridStackComponent from '../components/system/gridstack/gridStackComponent'
-
+import Cell from '../components/system/gridstack/cell'
+import { GridStack } from 'gridstack'
+import { createRef } from 'react'
+import ReactDOMServer from 'react-dom/server'
+import { ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { useDebouncedCallback } from 'use-debounce'
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 const TestPage = () => {
 	const [editMode, setEditMode] = useState(true)
+
+	const [savingToLS, setSavingToLS] = useState(true)
 
 	const [items, setItems] = useState([
 		{
@@ -72,11 +81,13 @@ const TestPage = () => {
 		},
 	])
 
-	const [itemsGridStack, setItemsGridStack] = useState([
-		{ id: 'item-1', content: <BtnDefault>Button</BtnDefault> },
-		{ id: 'item-2' },
-		{ id: 'item-3' },
-	])
+	// const [itemsGridStack, setItemsGridStack] = useState([
+	// 	{ id: 'item-1', content: <BtnDefault>Button</BtnDefault> },
+	// 	{ id: 'item-2' },
+	// 	{ id: 'item-3' },
+	// ])
+
+	// const [itemSaved, setItemSaved] = useState(null)
 
 	const [viewMode, setViewMode] = useState(false)
 	const classRef = useRef(null)
@@ -91,12 +102,11 @@ const TestPage = () => {
 
 	const [rowHeight, setRowHeight] = useState(40)
 
-	const [globalLayouts, setGlobalLayouts] = useState(null)
+	const [globalLayouts, setGlobalLayouts] = useState(items)
+
+	const [autoSaving, setAutoSaving] = useState(false)
 
 	const onDrop = (layout, layoutItem, event) => {
-		// console.log('Drop event:', event)
-		// console.log('Layout item:', layoutItem)
-
 		// Функция для вычисления высоты элемента
 		const calculateElementHeight = (elementHTML) => {
 			if (!elementHTML) return 1
@@ -123,8 +133,6 @@ const TestPage = () => {
 
 		const elementHeight = calculateElementHeight(draggingElement)
 
-		console.log('draggingElement', draggingElement)
-
 		layoutItem = {
 			...layoutItem,
 			w: 1,
@@ -140,16 +148,65 @@ const TestPage = () => {
 		setItems((prevItems) => [...prevItems, layoutItem])
 	}
 
-	const onLayoutChange = (layout, layouts) => {
-		saveToLS(layout)
-		setGlobalLayouts(layouts)
+	// const onLayoutChange = (layout) => {
+	// 		setItems(mergeItems(items, layout))
+	// 		saveToLS()
+	// }
+
+	const onLayoutChangeDebounced = useDebouncedCallback((layout, layouts) => {
+		setItems(mergeItems(items, layout))
+		saveToLS(mergeItems(items, layout))
+	}, 1000)
+
+	const saveToLS = (layout) => {
+		if (localStorage && layout) {
+			toast('Layout saved')
+
+			// Prepare a serializable copy (avoid circular refs from React elements)
+			const serializable = layout.map((item) => {
+				const { content, ...rest } = item
+				let contentHtml = null
+				if (typeof content === 'string') {
+					contentHtml = content
+				} else if (content) {
+					try {
+						contentHtml =
+							ReactDOMServer.renderToStaticMarkup(content)
+					} catch (e) {
+						contentHtml = null
+					}
+				}
+				return { ...rest, content: contentHtml }
+			})
+
+			localStorage.setItem('layout', JSON.stringify(serializable))
+		}
 	}
 
-	const saveToLS = (value) => {
-		// console.log(value)
-		// if (localStorage) {
-		// 	localStorage.setItem('layouts', JSON.stringify(value))
-		// }
+	// мердж items и globalLayouts для обновления координат элементов
+	const mergeItems = (items, globalLayouts) => {
+		// Создать быструю lookup-таблицу по id
+		const layoutMap = Object.fromEntries(
+			globalLayouts.map((item) => [item.i, item])
+		)
+
+		return items.map((item) => {
+			// если для данного элемента есть layout-объект - обновить координаты
+			if (layoutMap[item.i]) {
+				const { x, y, w, h } = layoutMap[item.i]
+				return { ...item, x, y, w, h }
+			}
+			// иначе вернуть без изменений
+			return item
+		})
+	}
+
+	const toastConfig = {
+		// position: 'top-right',
+		// autoClose: 1000,
+		// closeOnClick: true,
+		// closeButton: false,
+		// hideProgressBar: true,
 	}
 
 	return (
@@ -157,6 +214,15 @@ const TestPage = () => {
 			<main className='pb-28'>
 				<div className='flex flex-row flex-wrap lg:flex-nowrap items-start content-start gap-x-6 pt-2 w-full h-full'>
 					<SideNav className={'lg:w-[20%] w-full'} />
+					{/* <BtnDefault onClick={() => loadFromTS()}>
+						Load Layout
+					</BtnDefault> */}
+					<BtnDefault
+						onClick={() => saveToLS(items)}
+						disabled={globalLayouts == items}
+					>
+						Save Layout
+					</BtnDefault>
 					<div className='w-full lg:w-[80%]'>
 						<div className='flex items-center gap-4'>
 							<div className='flex items-center gap-2'>
@@ -218,6 +284,18 @@ const TestPage = () => {
 									type='number'
 								/>
 							</div>
+							<div className='flex items-center gap-2'>
+								<span className='font-medium text-sm'>
+									Auto saving:
+								</span>
+								<Toggle
+									checked={autoSaving}
+									onCheckedChange={() =>
+										setAutoSaving(!autoSaving)
+									}
+									disabled={autoSaving}
+								/>
+							</div>
 						</div>
 
 						<div
@@ -225,7 +303,6 @@ const TestPage = () => {
 							draggable={true}
 							unselectable='on'
 							onDragStart={(e) => {
-								// console.log(e)
 								setDraggingElement(e.target.innerHTML)
 							}}
 						>
@@ -266,9 +343,15 @@ const TestPage = () => {
 							isDraggable={editMode}
 							isResizable={editMode}
 							useCSSTransforms={true}
-							onLayoutChange={(layout, layouts) =>
-								onLayoutChange(layout, layouts)
-							}
+							onLayoutChange={(layout, layouts) => {
+								if (autoSaving) {
+									setGlobalLayouts(layout)
+									onLayoutChangeDebounced(
+										layout,
+										layouts
+									)
+								}
+							}}
 						>
 							{items.map((item) => (
 								<div
@@ -390,21 +473,34 @@ const TestPage = () => {
 								itemId={item.i}
 							/>
 						))}
-						<div className='mt-10'></div>
+						{/* <div className='mt-10'></div>
 						<TestComp />
 						<div className='mt-10'></div>
 						<TestMove />
-						<div className='mt-10'></div>
+						<div className='mt-10'></div> */}
 						{/* <Grid /> */}
 						<div className='mt-10'></div>
-						<GridStackComponent
+						{/* <GridStackComponent
 							items={itemsGridStack}
 							setItems={setItemsGridStack}
 							className='border rounded-lg'
-						/>
+						/> */}
+
 						<div className='mt-10'></div>
 					</div>
 				</div>
+				<ToastContainer
+					position='top-right'
+					hideProgressBar
+					closeOnClick
+					draggable
+					pauseOnHover
+					// toastClassName={() => 'toast toast-top toast-end'}
+					bodyClassName={() => 'p-0'}
+					limit={5}
+					autoClose={5000}
+					pauseOnFocusLoss={true}
+				/>
 			</main>
 		</>
 	)

@@ -176,6 +176,9 @@ const ContextCell = ({
 								sideOffset={2}
 								alignOffset={-5}
 							>
+								<ContextMenu.Label className='pl-[25px] text-xs leading-[25px]'>
+									Align
+								</ContextMenu.Label>
 								<ContextMenu.RadioGroup
 									value={justifyMode}
 									onValueChange={setJustifyMode}
@@ -220,6 +223,9 @@ const ContextCell = ({
 									value={alignMode}
 									onValueChange={setAlignMode}
 								>
+									<ContextMenu.Label className='pl-[25px] text-xs leading-[25px]'>
+										Justify
+									</ContextMenu.Label>
 									<ContextMenu.RadioItem
 										className={classNames(
 											itemClass
