@@ -28,8 +28,6 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 const TestPage = () => {
 	const [editMode, setEditMode] = useState(true)
 
-	const [savingToLS, setSavingToLS] = useState(true)
-
 	const [items, setItems] = useState([
 		{
 			i: '1',
@@ -81,6 +79,9 @@ const TestPage = () => {
 		},
 	])
 
+	const [savingToLS, setSavingToLS] = useState(true)
+
+	const [pendingSave, setPendingSave] = useState(false)
 	// const [itemsGridStack, setItemsGridStack] = useState([
 	// 	{ id: 'item-1', content: <BtnDefault>Button</BtnDefault> },
 	// 	{ id: 'item-2' },
@@ -104,7 +105,7 @@ const TestPage = () => {
 
 	const [globalLayouts, setGlobalLayouts] = useState(items)
 
-	const [autoSaving, setAutoSaving] = useState(false)
+	const [autoSaving, setAutoSaving] = useState(true)
 
 	const onDrop = (layout, layoutItem, event) => {
 		// Функция для вычисления высоты элемента
@@ -154,13 +155,14 @@ const TestPage = () => {
 	// }
 
 	const onLayoutChangeDebounced = useDebouncedCallback((layout, layouts) => {
+		setGlobalLayouts(layout)
 		setItems(mergeItems(items, layout))
 		saveToLS(mergeItems(items, layout))
 	}, 1000)
 
 	const saveToLS = (layout) => {
-		if (localStorage && layout) {
-			toast('Layout saved')
+		if (localStorage && items) {
+			// toast('Layout saved')
 
 			// Prepare a serializable copy (avoid circular refs from React elements)
 			const serializable = layout.map((item) => {
@@ -180,6 +182,7 @@ const TestPage = () => {
 			})
 
 			localStorage.setItem('layout', JSON.stringify(serializable))
+			setPendingSave(false)
 		}
 	}
 
@@ -218,7 +221,7 @@ const TestPage = () => {
 						Load Layout
 					</BtnDefault> */}
 					<BtnDefault
-						onClick={() => saveToLS(items)}
+						onClick={() => saveToLS(globalLayouts)}
 						disabled={globalLayouts == items}
 					>
 						Save Layout
@@ -308,14 +311,41 @@ const TestPage = () => {
 						>
 							<BtnDefault>Button</BtnDefault>
 						</div>
-						<ResponsiveGridLayout
-							className={classNames(
-								'mt-5 layout rounded-md',
-								{
-									'bg-base-100': !editMode,
-									'bg-base-300': editMode,
+						<div className='flex justify-end'>
+							<div
+								className='top-[1.75rem] right-[.25rem] tooltip-left z-20 relative w-[1.5rem] h-[1.5rem] tooltip'
+								data-tip={
+									pendingSave
+										? 'Pending save'
+										: 'Layout saved'
 								}
-							)}
+							>
+								{pendingSave && (
+									<span className='text-info loading loading-spinner loading-md'></span>
+								)}
+								{!pendingSave && (
+									<svg
+										xmlns='http://www.w3.org/2000/svg'
+										fill='none'
+										viewBox='0 0 24 24'
+										strokeWidth={1.5}
+										stroke='currentColor'
+										className='stroke-success size-6'
+									>
+										<path
+											strokeLinecap='round'
+											strokeLinejoin='round'
+											d='M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'
+										/>
+									</svg>
+								)}
+							</div>
+						</div>
+						<ResponsiveGridLayout
+							className={classNames('layout rounded-md', {
+								'bg-base-100': !editMode,
+								'bg-base-300': editMode,
+							})}
 							layouts={{ xl: items }}
 							breakpoints={{
 								xl: 1280,
@@ -344,8 +374,8 @@ const TestPage = () => {
 							isResizable={editMode}
 							useCSSTransforms={true}
 							onLayoutChange={(layout, layouts) => {
+								setPendingSave(true)
 								if (autoSaving) {
-									setGlobalLayouts(layout)
 									onLayoutChangeDebounced(
 										layout,
 										layouts
