@@ -221,7 +221,13 @@ const TestPage = () => {
 						Load Layout
 					</BtnDefault> */}
 					<BtnDefault
-						onClick={() => saveToLS(globalLayouts)}
+						onClick={() => {
+							new Promise((resolve) => {
+								resolve(saveToLS(globalLayouts))
+							}).then(() => {
+								toast('Layout saved')
+							})
+						}}
 						disabled={globalLayouts == items}
 					>
 						Save Layout
@@ -313,7 +319,7 @@ const TestPage = () => {
 						</div>
 						<div className='flex justify-end'>
 							<div
-								className='top-[1.75rem] right-[.25rem] tooltip-left z-20 relative w-[1.5rem] h-[1.5rem] tooltip'
+								className='top-[1.75rem] right-[.25rem] tooltip-left z-10 relative w-[1.5rem] h-[1.5rem] tooltip'
 								data-tip={
 									pendingSave
 										? 'Pending save'
